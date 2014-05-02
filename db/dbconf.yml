@@ -1,0 +1,11 @@
+test:
+  driver: postgres
+  open: user=timcheng dbname=mila_test sslmode=disable
+
+development:
+  driver: postgres
+  open: user=timcheng dbname=mila_dev sslmode=disable
+
+#development:
+#  driver: mymysql
+#  open: tcp:localhost:3306*mila_dev/root
