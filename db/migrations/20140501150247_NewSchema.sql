@@ -17,6 +17,7 @@ CREATE TABLE users (
 CREATE TABLE connections (
   user1_id integer REFERENCES users,
   user2_id integer REFERENCES users,
+  created_at timestamp,
   PRIMARY KEY (user1_id, user2_id)
 );
 

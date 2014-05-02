@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"github.com/coopernurse/gorp"
+	"strconv"
 	"time"
 )
 
@@ -19,19 +18,27 @@ type User struct {
 	PictureUrl  string    `db:"picture_url"`
 }
 
-func newUser(typ, email, firstName, lastName string) User {
-	return User{
+func (db *MyDb) newUser(typ, email, firstName, lastName string) (*User, error) {
+	return &User{
 		Type:      typ,
 		Email:     email,
 		FirstName: firstName,
 		LastName:  lastName,
 		CreatedAt: time.Now(),
-	}
+	}, nil
 }
 
-func GetUser(dbmap *gorp.DbMap, id int) (*User, error) {
+func (db *MyDb) GetUser(userId string) (*User, error) {
+	id, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, err
+	}
 	u := new(User)
-	err := dbmap.SelectOne(u, "select * from users where id=$1", id)
-	fmt.Println("user = ", u, " err= ", err)
+	err = db.SelectOne(u, "select * from users where id=$1", id)
 	return u, err
+}
+
+func (db *MyDb) PostUser(user *User) error {
+	err := db.Insert(user)
+	return err
 }
