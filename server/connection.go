@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/coopernurse/gorp"
 	"time"
 )
 
@@ -10,12 +11,18 @@ type Connection struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
+// Validation Hooks
+func (c *Connection) PreInsert(s gorp.SqlExecutor) error {
+	c.CreatedAt = time.Now()
+	return nil
+}
+
 func (db *MyDb) newConnection(user1Id, user2Id string) (*Connection, error) {
 	id1, id2, err := db.validateConnectionId(user1Id, user2Id)
 	if err != nil {
 		return nil, err
 	}
-	return &Connection{id1, id2, time.Now()}, err
+	return &Connection{User1Id: id1, User2Id: id2}, err
 }
 
 func (db *MyDb) PostConnection(conn *Connection) error {

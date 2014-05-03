@@ -4,7 +4,7 @@
 CREATE TABLE users (
   id    SERIAL PRIMARY KEY,
   created_at timestamp,
-  email varchar(128) NOT NULL,
+  email varchar(128) UNIQUE NOT NULL,
   password varchar(128) NOT NULL,
   type varchar(10) NOT NULL,
   admin boolean NOT NULL,

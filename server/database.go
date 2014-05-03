@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/coopernurse/gorp"
 	_ "github.com/lib/pq"
 	"log"
@@ -21,7 +22,9 @@ func (db *MyDb) addTestData() {
 	u2, _ := db.newUser("email", "b@c.d", "1234abcd", "Nee", "Naa")
 
 	err := db.Insert(u1, u2)
-	checkErr(err, "insert failed")
+	if err != nil {
+		fmt.Println("failed to insert: ", err)
+	}
 }
 
 func NewDb() *MyDb {

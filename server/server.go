@@ -61,15 +61,42 @@ func startServer() {
 	// users
 	m.Get("/users/:id", authFunc, func(params martini.Params, r render.Render) {
 		user, err := myDb.GetUser(params["id"])
-		renderResponse(r, err, 200, user, 404, "User not found")
+		if err == nil {
+			r.JSON(200, map[string]interface{}{
+				"id":          user.Id,
+				"first_name":  user.FirstName,
+				"last_name":   user.LastName,
+				"email":       user.Email,
+				"description": user.Description,
+			})
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "User not found " + err.Error(),
+			})
+		}
 	})
 
 	m.Post("/users", func(r render.Render, req *http.Request) {
-		user, err := myDb.newUser("email", req.FormValue("email"), req.FormValue("password"), req.FormValue("first_name"), req.FormValue("last_name"))
+		user, err := myDb.newUser(
+			"email",
+			req.FormValue("email"),
+			req.FormValue("password"),
+			req.FormValue("first_name"),
+			req.FormValue("last_name"),
+		)
+
 		if err == nil {
 			err = myDb.PostUser(user)
 		}
-		renderResponse(r, err, 201, user, 404, "Failed to add user")
+		if err == nil {
+			r.JSON(201, map[string]interface{}{
+				"id": user.Id,
+			})
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to add user " + err.Error(),
+			})
+		}
 	})
 
 	// connections
@@ -78,12 +105,27 @@ func startServer() {
 		if err == nil {
 			err = myDb.PostConnection(conn)
 		}
-		renderResponse(r, err, 201, conn, 404, "Failed to add connection")
+		if err == nil {
+			r.JSON(201, map[string]interface{}{
+				"user1_id": conn.User1Id,
+				"user2_id": conn.User2Id,
+			})
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to add connection " + err.Error(),
+			})
+		}
 	})
 
 	m.Delete("/connections", authFunc, func(r render.Render, req *http.Request) {
 		err := myDb.DeleteConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
-		renderResponse(r, err, 200, nil, 404, "Failed to add connection")
+		if err == nil {
+			r.JSON(200, nil)
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to delete connection " + err.Error(),
+			})
+		}
 	})
 
 	// posts
@@ -92,18 +134,18 @@ func startServer() {
 		if err == nil {
 			err = myDb.PostPost(post)
 		}
-		renderResponse(r, err, 201, post, 404, "Failed to add post")
+		if err == nil {
+			r.JSON(201, map[string]interface{}{
+				"id": post.Id,
+			})
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to add post " + err.Error(),
+			})
+		}
 	})
 
 	http.ListenAndServe(":8080", m)
-}
-
-func renderResponse(r render.Render, err error, passCode int, passObj interface{}, failCode int, failMsg string) {
-	if err == nil {
-		r.JSON(passCode, passObj)
-	} else {
-		r.JSON(404, map[string]interface{}{"message": failMsg})
-	}
 }
 
 func main() {

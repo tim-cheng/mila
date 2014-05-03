@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/coopernurse/gorp"
 	"strconv"
 	"time"
 )
@@ -21,6 +22,12 @@ type User struct {
 	PictureUrl  string    `db:"picture_url"`
 }
 
+// Validation Hooks
+func (u *User) PreInsert(s gorp.SqlExecutor) error {
+	u.CreatedAt = time.Now()
+	return nil
+}
+
 func (db *MyDb) newUser(typ, email, password, firstName, lastName string) (*User, error) {
 
 	// generate hash
@@ -35,7 +42,6 @@ func (db *MyDb) newUser(typ, email, password, firstName, lastName string) (*User
 		Admin:     false,
 		FirstName: firstName,
 		LastName:  lastName,
-		CreatedAt: time.Now(),
 	}, nil
 }
 

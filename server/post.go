@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/coopernurse/gorp"
 	"time"
 )
 
@@ -12,15 +13,20 @@ type Post struct {
 	PictureUrl string    `db:"picture_url"`
 }
 
+// Validation Hooks
+func (p *Post) PreInsert(s gorp.SqlExecutor) error {
+	p.CreatedAt = time.Now()
+	return nil
+}
+
 func (db *MyDb) newPost(userId, content string) (*Post, error) {
 	id, err := db.validateUserId(userId)
 	if err != nil {
 		return nil, err
 	}
 	return &Post{
-		CreatedAt: time.Now(),
-		UserId:    id,
-		Body:      content,
+		UserId: id,
+		Body:   content,
 	}, nil
 }
 
