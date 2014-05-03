@@ -17,8 +17,8 @@ func (db *MyDb) addTestData() {
 	//  checkErr(err, "Truncate failed")
 
 	// insert some seed data
-	u1, _ := db.newUser("email", "a@b.c", "Boo", "Daa")
-	u2, _ := db.newUser("email", "b@c.d", "Nee", "Naa")
+	u1, _ := db.newUser("email", "a@b.c", "abcd1234", "Boo", "Daa")
+	u2, _ := db.newUser("email", "b@c.d", "1234abcd", "Nee", "Naa")
 
 	err := db.Insert(u1, u2)
 	checkErr(err, "insert failed")

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -19,14 +20,21 @@ type User struct {
 	PictureUrl  string    `db:"picture_url"`
 }
 
-func (db *MyDb) newUser(typ, email, firstName, lastName string) (*User, error) {
+func (db *MyDb) newUser(typ, email, password, firstName, lastName string) (*User, error) {
+
+	// generate hash
+	hashQuery := fmt.Sprintf("select crypt('%s', gen_salt('md5'))", password)
+	var hash string
+	db.SelectOne(&hash, hashQuery)
+	fmt.Println("hash = ", hash)
+
 	return &User{
 		Type:      typ,
 		Email:     email,
+		Password:  hash,
 		FirstName: firstName,
 		LastName:  lastName,
 		CreatedAt: time.Now(),
-		Password:  "$apr1$dooCS9Ah$lpjzNcB6mBLEf1UA6N0q60",
 	}, nil
 }
 

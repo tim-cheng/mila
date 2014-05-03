@@ -43,7 +43,7 @@ func main() {
 	})
 
 	m.Post("/users", func(r render.Render, req *http.Request) {
-		user, err := myDb.newUser("email", req.FormValue("email"), req.FormValue("first_name"), req.FormValue("last_name"))
+		user, err := myDb.newUser("email", req.FormValue("email"), req.FormValue("password"), req.FormValue("first_name"), req.FormValue("last_name"))
 		if err == nil {
 			err = myDb.PostUser(user)
 		}
