@@ -31,7 +31,7 @@ func (au *authUser) GetUser() string {
 	return au.User
 }
 
-func main() {
+func startServer() {
 	myDb = NewDb()
 	defer myDb.Db.Close()
 
@@ -104,4 +104,9 @@ func renderResponse(r render.Render, err error, passCode int, passObj interface{
 	} else {
 		r.JSON(404, map[string]interface{}{"message": failMsg})
 	}
+}
+
+func main() {
+	go startServer()
+	select {}
 }
