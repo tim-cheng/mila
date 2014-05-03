@@ -60,6 +60,14 @@ func createPost(email, password, userId, content string) int {
 	return testClient(email, password, "POST", "/posts", params.Encode())
 }
 
+func createComment(email, password, userId, postId, content string) int {
+	params := url.Values{}
+	params.Add("user_id", userId)
+	params.Add("post_id", postId)
+	params.Add("body", content)
+	return testClient(email, password, "POST", "/comments", params.Encode())
+}
+
 func checkCode(t *testing.T, msg string, code int, expect int) {
 	t.Log("test: " + msg)
 	if code == expect {
@@ -101,5 +109,12 @@ func TestBasic(t *testing.T) {
 
 	checkCode(t, "create post", createPost(e, p, "1", "This is post1"), 201)
 	checkCode(t, "create post", createPost(e, p, "1", "This is post2"), 201)
+	checkCode(t, "create post auth", createPost(e, "testtest", "1", "This is post2"), 401)
+	checkCode(t, "create post non-existent user", createPost(e, p, "100", "This is post2"), 404)
+
+	checkCode(t, "create comment", createComment(e, p, "1", "1", "This is comment1"), 201)
+	checkCode(t, "create comment non-existent user", createComment(e, p, "100", "1", "This is comment1"), 404)
+	checkCode(t, "create comment non-existent post", createComment(e, p, "1", "100", "This is comment1"), 404)
+	checkCode(t, "create comment auth", createComment(e, "testtest", "1", "1", "This is comment1"), 401)
 
 }

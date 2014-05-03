@@ -18,6 +18,7 @@ func NewDb() *MyDb {
 	dbmap.AddTableWithName(User{}, "users").SetKeys(true, "Id")
 	dbmap.AddTableWithName(Connection{}, "connections").SetKeys(false, "user1_id", "user2_id")
 	dbmap.AddTableWithName(Post{}, "posts").SetKeys(true, "Id")
+	dbmap.AddTableWithName(Comment{}, "comments").SetKeys(true, "Id")
 	return dbmap
 }
 
