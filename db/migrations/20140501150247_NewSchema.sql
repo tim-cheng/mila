@@ -5,6 +5,7 @@ CREATE TABLE users (
   id    SERIAL PRIMARY KEY,
   created_at timestamp,
   email varchar(128) NOT NULL,
+  password varchar(128) NOT NULL,
   type varchar(10) NOT NULL,
   first_name varchar(32) NOT NULL,
   last_name varchar(32) NOT NULL,

@@ -1,13 +1,23 @@
 package main
 
 import (
+	"fmt"
+	auth "github.com/abbot/go-http-auth"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"net/http"
-	//"fmt"
 )
 
 var myDb *MyDb
+
+func Secret(user, realm string) string {
+	p, err := myDb.GetPassword(user)
+	if err != nil {
+		return ""
+	} else {
+		return p
+	}
+}
 
 func main() {
 	myDb = NewDb()
@@ -17,13 +27,17 @@ func main() {
 	m.Use(render.Renderer())
 
 	// Routes
-
 	m.Get("/", func() string {
 		return "Welcome to Mila"
 	})
 
+	authenticator := auth.NewBasicAuthenticator("mila.com", Secret)
+	authFunc := authenticator.Wrap(func(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
+		fmt.Println("auth user: ", r.Username)
+	})
+
 	// users
-	m.Get("/users/:id", func(params martini.Params, r render.Render) {
+	m.Get("/users/:id", authFunc, func(params martini.Params, r render.Render) {
 		user, err := myDb.GetUser(params["id"])
 		renderResponse(r, err, 200, user, 404, "User not found")
 	})
@@ -48,6 +62,15 @@ func main() {
 	m.Delete("/connections", func(r render.Render, req *http.Request) {
 		err := myDb.DeleteConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
 		renderResponse(r, err, 200, nil, 404, "Failed to add connection")
+	})
+
+	// posts
+	m.Post("/posts", func(r render.Render, req *http.Request) {
+		post, err := myDb.newPost(req.FormValue("user_id"), req.FormValue("body"))
+		if err == nil {
+			err = myDb.PostPost(post)
+		}
+		renderResponse(r, err, 201, post, 404, "Failed to add post")
 	})
 
 	http.ListenAndServe(":8080", m)
