@@ -19,6 +19,18 @@ func Secret(user, realm string) string {
 	}
 }
 
+// injection example (injecting username), not used
+type authUser struct {
+	User string
+}
+type AuthUser interface {
+	GetUser() string
+}
+
+func (au *authUser) GetUser() string {
+	return au.User
+}
+
 func main() {
 	myDb = NewDb()
 	defer myDb.Db.Close()
@@ -26,14 +38,24 @@ func main() {
 	m := martini.Classic()
 	m.Use(render.Renderer())
 
+	// authentication
+	basicAuth := auth.NewBasicAuthenticator("mila.com", Secret)
+	authFunc := basicAuth.Wrap(func(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
+		fmt.Println("auth user: ", r.Username)
+	})
+	//m.Use(authFunc)
+
+	// request level injection example
+	m.Use(func(req *http.Request, c martini.Context) {
+		// inject to interface (override existing interface)
+		//c.MapTo(&authUser{basicAuth.CheckAuth(req)}, (*AuthUser)(nil))
+		// inject to struct
+		c.Map(&authUser{basicAuth.CheckAuth(req)})
+	})
+
 	// Routes
 	m.Get("/", func() string {
 		return "Welcome to Mila"
-	})
-
-	authenticator := auth.NewBasicAuthenticator("mila.com", Secret)
-	authFunc := authenticator.Wrap(func(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
-		fmt.Println("auth user: ", r.Username)
 	})
 
 	// users
@@ -51,7 +73,7 @@ func main() {
 	})
 
 	// connections
-	m.Post("/connections", func(r render.Render, req *http.Request) {
+	m.Post("/connections", authFunc, func(r render.Render, req *http.Request) {
 		conn, err := myDb.newConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
 		if err == nil {
 			err = myDb.PostConnection(conn)
@@ -59,13 +81,13 @@ func main() {
 		renderResponse(r, err, 201, conn, 404, "Failed to add connection")
 	})
 
-	m.Delete("/connections", func(r render.Render, req *http.Request) {
+	m.Delete("/connections", authFunc, func(r render.Render, req *http.Request) {
 		err := myDb.DeleteConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
 		renderResponse(r, err, 200, nil, 404, "Failed to add connection")
 	})
 
 	// posts
-	m.Post("/posts", func(r render.Render, req *http.Request) {
+	m.Post("/posts", authFunc, func(r render.Render, req *http.Request) {
 		post, err := myDb.newPost(req.FormValue("user_id"), req.FormValue("body"))
 		if err == nil {
 			err = myDb.PostPost(post)

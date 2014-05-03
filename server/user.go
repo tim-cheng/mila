@@ -12,6 +12,7 @@ type User struct {
 	Email       string    `db:"email"`
 	Password    string    `db:"password"`
 	Type        string    `db:"type"`
+	Admin       bool      `db:"admin"`
 	FirstName   string    `db:"first_name"`
 	LastName    string    `db:"last_name"`
 	NumDegree1  int64     `db:"num_degree1"`
@@ -26,12 +27,12 @@ func (db *MyDb) newUser(typ, email, password, firstName, lastName string) (*User
 	hashQuery := fmt.Sprintf("select crypt('%s', gen_salt('md5'))", password)
 	var hash string
 	db.SelectOne(&hash, hashQuery)
-	fmt.Println("hash = ", hash)
 
 	return &User{
 		Type:      typ,
 		Email:     email,
 		Password:  hash,
+		Admin:     false,
 		FirstName: firstName,
 		LastName:  lastName,
 		CreatedAt: time.Now(),

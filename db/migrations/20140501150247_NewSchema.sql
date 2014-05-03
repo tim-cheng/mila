@@ -7,6 +7,7 @@ CREATE TABLE users (
   email varchar(128) NOT NULL,
   password varchar(128) NOT NULL,
   type varchar(10) NOT NULL,
+  admin boolean NOT NULL,
   first_name varchar(32) NOT NULL,
   last_name varchar(32) NOT NULL,
   num_degree1 integer,
