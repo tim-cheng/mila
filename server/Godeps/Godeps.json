@@ -1,0 +1,34 @@
+{
+	"ImportPath": "github.com/tim-cheng/mila/server",
+	"GoVersion": "go1.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/abbot/go-http-auth",
+			"Rev": "0c7409b87f66b1b5037bbf9f866aa9d8f7fd135c"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Comment": "v1.0-rc1",
+			"Rev": "37d7f8432a3e684eef9b2edece76bdfa6ac85b39"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini",
+			"Comment": "v1.0-rc1",
+			"Rev": "de643861770082784ad14cba4557ad68568dcc7b"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini-contrib/render",
+			"Comment": "v0.1-159-g8ce6181",
+			"Rev": "8ce6181c2609699e4c7cd30994b76a850a9cdadc"
+		},
+		{
+			"ImportPath": "github.com/coopernurse/gorp",
+			"Comment": "v1.5",
+			"Rev": "242be3eec6e4d545d0eca24b5dc71236b71ac656"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Rev": "c808a1bb644594ca717ac61f71e6b0e454b835e2"
+		}
+	]
+}
