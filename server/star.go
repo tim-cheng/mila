@@ -1,8 +1,9 @@
 package main
 
-/*import (
-  "fmt"
-)*/
+import (
+	//  "fmt"
+	"errors"
+)
 
 type Star struct {
 	PostId int64 `db:"post_id"`
@@ -26,5 +27,13 @@ func (db *MyDb) newStar(userId, postId string) (*Star, error) {
 
 func (db *MyDb) PutStar(s *Star) error {
 	err := db.Insert(s)
+	return err
+}
+
+func (db *MyDb) DeleteStar(s *Star) error {
+	count, err := db.Delete(s)
+	if count != 1 {
+		return errors.New("couldn't delete star")
+	}
 	return err
 }

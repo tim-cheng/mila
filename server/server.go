@@ -184,6 +184,23 @@ func startServer() {
 		}
 	})
 
+	m.Delete("/posts/:id/stars", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
+		s, err := myDb.newStar(
+			req.FormValue("user_id"),
+			params["id"],
+		)
+		if err == nil {
+			err = myDb.DeleteStar(s)
+		}
+		if err == nil {
+			r.JSON(200, nil)
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to delete star " + err.Error(),
+			})
+		}
+	})
+
 	http.ListenAndServe(":8080", m)
 }
 

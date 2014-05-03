@@ -67,10 +67,18 @@ func createComment(email, password, userId, postId, content string) int {
 	return testClient(email, password, "POST", "/posts/"+postId+"/comments", params.Encode())
 }
 
-func createStar(email, password, userId, postId string) int {
+func testStar(method, email, password, userId, postId string) int {
 	params := url.Values{}
 	params.Add("user_id", userId)
-	return testClient(email, password, "PUT", "/posts/"+postId+"/stars?"+params.Encode(), "")
+	return testClient(email, password, method, "/posts/"+postId+"/stars?"+params.Encode(), "")
+}
+
+func createStar(email, password, userId, postId string) int {
+	return testStar("PUT", email, password, userId, postId)
+}
+
+func deleteStar(email, password, userId, postId string) int {
+	return testStar("DELETE", email, password, userId, postId)
 }
 
 func checkCode(t *testing.T, msg string, code int, expect int) {
@@ -127,5 +135,8 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "create star non-existent post", createStar(e, p, "1", "100"), 404)
 	checkCode(t, "create star auth", createStar(e, "testtest", "1", "2"), 401)
 	checkCode(t, "can't start again", createStar(e, p, "1", "1"), 404)
+
+	checkCode(t, "delete star", deleteStar(e, p, "1", "1"), 200)
+	checkCode(t, "delete non-existent star", deleteStar(e, p, "1", "2"), 404)
 
 }
