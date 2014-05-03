@@ -46,6 +46,20 @@ func createUser(email, password, firstname, lastname string) int {
 	return testClient("", "", "POST", "/users", params.Encode())
 }
 
+func createConnection(email, password, id1, id2 string) int {
+	params := url.Values{}
+	params.Add("user1_id", id1)
+	params.Add("user2_id", id2)
+	return testClient(email, password, "POST", "/connections", params.Encode())
+}
+
+func createPost(email, password, userId, content string) int {
+	params := url.Values{}
+	params.Add("user_id", userId)
+	params.Add("body", content)
+	return testClient(email, password, "POST", "/posts", params.Encode())
+}
+
 func checkCode(t *testing.T, msg string, code int, expect int) {
 	t.Log("test: " + msg)
 	if code == expect {
@@ -59,33 +73,33 @@ func TestBasic(t *testing.T) {
 	go startServer()
 	time.Sleep(time.Second * 2)
 
-	//	testClient(e, p, "GET", "/users/1", "")
-
-	var code int
 	// create users
 	numList := []string{"1", "2", "3", "4", "5", "6", "7", "8"}
 	for _, v := range numList {
 		e, p, f, l := "user"+v+"@test.com", "testtest"+v, "First"+v, "Last"+v
-		code = createUser(e, p, f, l)
-		checkCode(t, "create user", code, 201)
+		checkCode(t, "create user", createUser(e, p, f, l), 201)
 	}
 
-	// create user with same username:
-	code = createUser("user4@test.com", "sdfsfss", "sfsfs", "sfsfs")
-	checkCode(t, "create user with same username", code, 404)
+	checkCode(t, "create user with same username", createUser("user4@test.com", "sdfsfss", "sfsfs", "sfsfs"), 404)
 
-	// get user
 	e, p := "user1@test.com", "testtest1"
-	code = testClient(e, p, "GET", "/users/1", "")
-	checkCode(t, "get user info self", code, 200)
-	code = testClient(e, p, "GET", "/users/2", "")
-	checkCode(t, "get user info others", code, 200)
 
-	// user doesn't exist
-	code = testClient(e, p, "GET", "/user/100", "")
-	checkCode(t, "get user info doesn't exist", code, 404)
+	checkCode(t, "get user info self", testClient(e, p, "GET", "/users/1", ""), 200)
+	checkCode(t, "get user info others", testClient(e, p, "GET", "/users/2", ""), 200)
+	checkCode(t, "get user info doesn't exist", testClient(e, p, "GET", "/users/100", ""), 404)
+	checkCode(t, "get user info auth fail", testClient(e, "testtest", "GET", "/users/1", ""), 401)
 
-	// auth fail
-	testClient(e, "testtest", "GET", "/user/1", "")
-	checkCode(t, "get user info auth fail", code, 404)
+	checkCode(t, "create connection", createConnection(e, p, "1", "2"), 201)
+	checkCode(t, "create connection", createConnection(e, p, "1", "3"), 201)
+	checkCode(t, "create connection", createConnection(e, p, "1", "4"), 201)
+	checkCode(t, "create connection", createConnection(e, p, "5", "1"), 201)
+	checkCode(t, "create connection", createConnection(e, p, "6", "1"), 201)
+
+	checkCode(t, "can't connect again", createConnection(e, p, "1", "2"), 404)
+	checkCode(t, "can't connect with self", createConnection(e, p, "1", "1"), 404)
+	checkCode(t, "connect auth fail", createConnection(e, "testtest", "1", "7"), 401)
+
+	checkCode(t, "create post", createPost(e, p, "1", "This is post1"), 201)
+	checkCode(t, "create post", createPost(e, p, "1", "This is post2"), 201)
+
 }

@@ -19,6 +19,20 @@ func (db *MyDb) validateUserId(userId string) (id int64, err error) {
 	return
 }
 
+func (db *MyDb) validatePostId(postId string) (id int64, err error) {
+	// validate ids are valid numbers
+	id, err = strconv.ParseInt(postId, 0, 64)
+	if err != nil {
+		return
+	}
+	// validate user exists
+	_, err = db.Get(Post{}, id)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (db *MyDb) validateConnectionId(user1Id string, user2Id string) (id1 int64, id2 int64, err error) {
 
 	// validate ids are valid numbers

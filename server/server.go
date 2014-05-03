@@ -145,6 +145,27 @@ func startServer() {
 		}
 	})
 
+	// comments
+	m.Post("/comments", authFunc, func(r render.Render, req *http.Request) {
+		c, err := myDb.newComemnt(
+			req.FormValue("user_id"),
+			req.FormValue("post_id"),
+			req.FormValue("body"),
+		)
+		if err == nil {
+			err = myDb.PostComment(c)
+		}
+		if err == nil {
+			r.JSON(201, map[string]interface{}{
+				"id": c.Id,
+			})
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to add comment " + err.Error(),
+			})
+		}
+	})
+
 	http.ListenAndServe(":8080", m)
 }
 
