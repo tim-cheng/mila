@@ -63,9 +63,14 @@ func createPost(email, password, userId, content string) int {
 func createComment(email, password, userId, postId, content string) int {
 	params := url.Values{}
 	params.Add("user_id", userId)
-	params.Add("post_id", postId)
 	params.Add("body", content)
-	return testClient(email, password, "POST", "/comments", params.Encode())
+	return testClient(email, password, "POST", "/posts/"+postId+"/comments", params.Encode())
+}
+
+func createStar(email, password, userId, postId string) int {
+	params := url.Values{}
+	params.Add("user_id", userId)
+	return testClient(email, password, "PUT", "/posts/"+postId+"/stars?"+params.Encode(), "")
 }
 
 func checkCode(t *testing.T, msg string, code int, expect int) {
@@ -116,5 +121,11 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "create comment non-existent user", createComment(e, p, "100", "1", "This is comment1"), 404)
 	checkCode(t, "create comment non-existent post", createComment(e, p, "1", "100", "This is comment1"), 404)
 	checkCode(t, "create comment auth", createComment(e, "testtest", "1", "1", "This is comment1"), 401)
+
+	checkCode(t, "create star", createStar(e, p, "1", "1"), 200)
+	checkCode(t, "create star non-existent user", createStar(e, p, "100", "1"), 404)
+	checkCode(t, "create star non-existent post", createStar(e, p, "1", "100"), 404)
+	checkCode(t, "create star auth", createStar(e, "testtest", "1", "2"), 401)
+	checkCode(t, "can't start again", createStar(e, p, "1", "1"), 404)
 
 }

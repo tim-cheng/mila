@@ -146,10 +146,10 @@ func startServer() {
 	})
 
 	// comments
-	m.Post("/comments", authFunc, func(r render.Render, req *http.Request) {
+	m.Post("/posts/:id/comments", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
 		c, err := myDb.newComemnt(
 			req.FormValue("user_id"),
-			req.FormValue("post_id"),
+			params["id"],
 			req.FormValue("body"),
 		)
 		if err == nil {
@@ -162,6 +162,24 @@ func startServer() {
 		} else {
 			r.JSON(404, map[string]interface{}{
 				"message": "Failed to add comment " + err.Error(),
+			})
+		}
+	})
+
+	// stars
+	m.Put("/posts/:id/stars", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
+		s, err := myDb.newStar(
+			req.FormValue("user_id"),
+			params["id"],
+		)
+		if err == nil {
+			err = myDb.PutStar(s)
+		}
+		if err == nil {
+			r.JSON(200, nil)
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to add star " + err.Error(),
 			})
 		}
 	})
