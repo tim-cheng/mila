@@ -40,6 +40,6 @@ func (db *MyDb) GetPosts(userId string) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	posts, err := db.Select(Post{}, "select * from posts where id=$1", id)
+	posts, err := db.Select(Post{}, "select * from posts where user_id=$1", id)
 	return posts, err
 }

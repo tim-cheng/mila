@@ -122,6 +122,10 @@ func TestBasic(t *testing.T) {
 
 	checkCode(t, "create post", createPost(e, p, "1", "This is post1"), 201)
 	checkCode(t, "create post", createPost(e, p, "1", "This is post2"), 201)
+	checkCode(t, "create post", createPost(e, p, "1", "This is post3"), 201)
+	checkCode(t, "create post", createPost(e, p, "1", "This is post4"), 201)
+	checkCode(t, "create post", createPost(e, p, "2", "This is post5"), 201)
+	checkCode(t, "create post", createPost(e, p, "2", "This is post6"), 201)
 	checkCode(t, "create post auth", createPost(e, "testtest", "1", "This is post2"), 401)
 	checkCode(t, "create post non-existent user", createPost(e, p, "100", "This is post2"), 404)
 
