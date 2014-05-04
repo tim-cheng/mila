@@ -82,6 +82,8 @@ func startServer() {
 				"last_name":   user.LastName,
 				"email":       user.Email,
 				"description": user.Description,
+				"num_degree1": user.NumDegree1,
+				"num_degree2": user.NumDegree2,
 			})
 		} else {
 			r.JSON(404, map[string]interface{}{
@@ -155,6 +157,17 @@ func startServer() {
 		} else {
 			r.JSON(404, map[string]interface{}{
 				"message": "Failed to add post " + err.Error(),
+			})
+		}
+	})
+
+	m.Get("/posts", authFunc, func(r render.Render, req *http.Request) {
+		posts, err := myDb.GetPosts(req.FormValue("user_id"))
+		if err == nil {
+			r.JSON(200, posts)
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to get posts " + err.Error(),
 			})
 		}
 	})

@@ -34,3 +34,12 @@ func (db *MyDb) PostPost(post *Post) error {
 	err := db.Insert(post)
 	return err
 }
+
+func (db *MyDb) GetPosts(userId string) ([]interface{}, error) {
+	id, err := db.validateUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+	posts, err := db.Select(Post{}, "select * from posts where id=$1", id)
+	return posts, err
+}

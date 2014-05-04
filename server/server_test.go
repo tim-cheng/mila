@@ -141,4 +141,9 @@ func TestBasic(t *testing.T) {
 
 	checkCode(t, "login", testClient(e, p, "GET", "/login", ""), 200)
 	checkCode(t, "login auth fail", testClient(e, "testtest", "GET", "/login", ""), 401)
+
+	checkCode(t, "get posts", testClient(e, p, "GET", "/posts?user_id=1", ""), 200)
+	checkCode(t, "get posts without user_id", testClient(e, p, "GET", "/posts", ""), 404)
+	checkCode(t, "get posts with invalid user_id", testClient(e, p, "GET", "/posts?user_id=abc", ""), 404)
+
 }
