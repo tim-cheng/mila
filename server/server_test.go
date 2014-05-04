@@ -130,6 +130,9 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "create post non-existent user", createPost(e, p, "100", "This is post2"), 404)
 
 	checkCode(t, "create comment", createComment(e, p, "1", "1", "This is comment1"), 201)
+	checkCode(t, "create comment", createComment(e, p, "1", "2", "This is comment2"), 201)
+	checkCode(t, "create comment", createComment(e, p, "2", "1", "This is comment3"), 201)
+	checkCode(t, "create comment", createComment(e, p, "2", "2", "This is comment4"), 201)
 	checkCode(t, "create comment non-existent user", createComment(e, p, "100", "1", "This is comment1"), 404)
 	checkCode(t, "create comment non-existent post", createComment(e, p, "1", "100", "This is comment1"), 404)
 	checkCode(t, "create comment auth", createComment(e, "testtest", "1", "1", "This is comment1"), 401)
@@ -142,6 +145,11 @@ func TestBasic(t *testing.T) {
 
 	checkCode(t, "delete star", deleteStar(e, p, "1", "1"), 200)
 	checkCode(t, "delete non-existent star", deleteStar(e, p, "1", "2"), 404)
+
+	checkCode(t, "create star", createStar(e, p, "1", "1"), 200)
+	checkCode(t, "create star", createStar(e, p, "2", "1"), 200)
+	checkCode(t, "create star", createStar(e, p, "1", "2"), 200)
+	checkCode(t, "create star", createStar(e, p, "2", "2"), 200)
 
 	checkCode(t, "login", testClient(e, p, "GET", "/login", ""), 200)
 	checkCode(t, "login auth fail", testClient(e, "testtest", "GET", "/login", ""), 401)

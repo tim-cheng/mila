@@ -163,8 +163,22 @@ func startServer() {
 
 	m.Get("/posts", authFunc, func(r render.Render, req *http.Request) {
 		posts, err := myDb.GetPosts(req.FormValue("user_id"))
-		if err == nil {
-			r.JSON(200, posts)
+		if err == nil && len(posts) > 0 {
+			retPosts := make([]map[string]interface{}, len(posts))
+			for i := range posts {
+				p := posts[i].(*Post)
+				nComments, _ := myDb.GetNumComments(p.Id)
+				nStars, _ := myDb.GetNumStars(p.Id)
+				retPosts[i] = map[string]interface{}{
+					"id": p.Id,
+					"user_id": p.UserId,
+					"body": p.Body,
+					"created_at" : p.CreatedAt,
+					"num_comments" : nComments,
+					"num_stars" : nStars,
+				}
+			}
+			r.JSON(200, retPosts)
 		} else {
 			r.JSON(404, map[string]interface{}{
 				"message": "Failed to get posts " + err.Error(),

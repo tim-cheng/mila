@@ -39,3 +39,8 @@ func (db *MyDb) PostComment(c *Comment) error {
 	err := db.Insert(c)
 	return err
 }
+
+func (db *MyDb) GetNumComments(postId int64) (int, error) {
+	count, err := db.SelectInt("select count(*) from comments where post_id=$1", postId)
+	return int(count), err
+}

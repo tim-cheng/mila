@@ -37,3 +37,8 @@ func (db *MyDb) DeleteStar(s *Star) error {
 	}
 	return err
 }
+
+func (db *MyDb) GetNumStars(postId int64) (int, error) {
+	count, err := db.SelectInt("select count(*) from stars where post_id=$1", postId)
+	return int(count), err
+}
