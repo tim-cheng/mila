@@ -35,3 +35,9 @@ func (db *MyDb) DeleteConnection(user1Id, user2Id string) error {
 	// TODO
 	return nil
 }
+
+func (db *MyDb) GetNumConnections(userId int64) (int, error) {
+	count, err := db.SelectInt("select count(*) from connections where (user1_id=$1 or user2_id=$2)", userId, userId)
+
+	return int(count), err
+}

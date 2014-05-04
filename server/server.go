@@ -76,13 +76,14 @@ func startServer() {
 	m.Get("/users/:id", authFunc, func(params martini.Params, r render.Render) {
 		user, err := myDb.GetUser(params["id"])
 		if err == nil {
+			nConn, _ := myDb.GetNumConnections(user.Id)
 			r.JSON(200, map[string]interface{}{
 				"id":          user.Id,
 				"first_name":  user.FirstName,
 				"last_name":   user.LastName,
 				"email":       user.Email,
 				"description": user.Description,
-				"num_degree1": user.NumDegree1,
+				"num_degree1": nConn,
 				"num_degree2": user.NumDegree2,
 			})
 		} else {
@@ -162,7 +163,7 @@ func startServer() {
 	})
 
 	m.Get("/posts", authFunc, func(r render.Render, req *http.Request) {
-		posts, err := myDb.GetPosts(req.FormValue("user_id"))
+		posts, err := myDb.GetPosts(req.FormValue("user_id"), req.FormValue("degree"))
 		if err == nil && len(posts) > 0 {
 			retPosts := make([]map[string]interface{}, len(posts))
 			for i := range posts {
@@ -170,12 +171,12 @@ func startServer() {
 				nComments, _ := myDb.GetNumComments(p.Id)
 				nStars, _ := myDb.GetNumStars(p.Id)
 				retPosts[i] = map[string]interface{}{
-					"id": p.Id,
-					"user_id": p.UserId,
-					"body": p.Body,
-					"created_at" : p.CreatedAt,
-					"num_comments" : nComments,
-					"num_stars" : nStars,
+					"id":           p.Id,
+					"user_id":      p.UserId,
+					"body":         p.Body,
+					"created_at":   p.CreatedAt,
+					"num_comments": nComments,
+					"num_stars":    nStars,
 				}
 			}
 			r.JSON(200, retPosts)

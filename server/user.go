@@ -36,12 +36,13 @@ func (db *MyDb) newUser(typ, email, password, firstName, lastName string) (*User
 	db.SelectOne(&hash, hashQuery)
 
 	return &User{
-		Type:      typ,
-		Email:     email,
-		Password:  hash,
-		Admin:     false,
-		FirstName: firstName,
-		LastName:  lastName,
+		Type:        typ,
+		Email:       email,
+		Password:    hash,
+		Admin:       false,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Description: "proud parent",
 	}, nil
 }
 
