@@ -1,10 +1,10 @@
 test:
   driver: postgres
-  open: user=timcheng dbname=mila_test sslmode=disable
+  open: user=postgres password=postgres dbname=mila_test sslmode=disable
 
 development:
   driver: postgres
-  open: user=timcheng dbname=mila_dev sslmode=disable
+  open: user=postgres password=postgres dbname=mila_dev sslmode=disable
 
 #development:
 #  driver: mymysql

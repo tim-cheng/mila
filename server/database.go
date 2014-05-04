@@ -12,7 +12,7 @@ type MyDb struct {
 }
 
 func NewDb() *MyDb {
-	db, err := sql.Open("postgres", "user=timcheng dbname=mila_dev sslmode=disable")
+	db, err := sql.Open("postgres", "user=postgres password=postgres dbname=mila_dev sslmode=disable")
 	checkErr(err, "sql.Open failed")
 	dbmap := &MyDb{gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}}
 	dbmap.AddTableWithName(User{}, "users").SetKeys(true, "Id")
