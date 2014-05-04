@@ -58,6 +58,20 @@ func startServer() {
 		return "Welcome to Mila"
 	})
 
+	// login
+	m.Get("/login", authFunc, func(r render.Render, req *http.Request) {
+		email := basicAuth.CheckAuth(req)
+		user, err := myDb.GetUserByEmail(email)
+		fmt.Println("email: ", email, " user.id = ", user.Id)
+		if err == nil {
+			r.JSON(200, map[string]interface{}{
+				"id": user.Id,
+			})
+		} else {
+			r.JSON(500, nil)
+		}
+	})
+
 	// users
 	m.Get("/users/:id", authFunc, func(params martini.Params, r render.Render) {
 		user, err := myDb.GetUser(params["id"])

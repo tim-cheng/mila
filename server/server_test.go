@@ -139,4 +139,6 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "delete star", deleteStar(e, p, "1", "1"), 200)
 	checkCode(t, "delete non-existent star", deleteStar(e, p, "1", "2"), 404)
 
+	checkCode(t, "login", testClient(e, p, "GET", "/login", ""), 200)
+	checkCode(t, "login auth fail", testClient(e, "testtest", "GET", "/login", ""), 401)
 }

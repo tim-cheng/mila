@@ -55,6 +55,12 @@ func (db *MyDb) GetUser(userId string) (*User, error) {
 	return u, err
 }
 
+func (db *MyDb) GetUserByEmail(email string) (*User, error) {
+	u := new(User)
+	err := db.SelectOne(u, "select * from users where email=$1", email)
+	return u, err
+}
+
 func (db *MyDb) PostUser(user *User) error {
 	err := db.Insert(user)
 	return err
