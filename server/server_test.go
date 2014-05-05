@@ -137,6 +137,10 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "create comment non-existent post", createComment(e, p, "1", "100", "This is comment1"), 404)
 	checkCode(t, "create comment auth", createComment(e, "testtest", "1", "1", "This is comment1"), 401)
 
+	checkCode(t, "get comment, has comments", testClient(e, p, "GET", "/posts/1/comments", ""), 200)
+	checkCode(t, "get comment, no comments", testClient(e, p, "GET", "/posts/3/comments", ""), 404)
+	checkCode(t, "get comment, no posts", testClient(e, p, "GET", "/posts/100/comments", ""), 404)
+
 	checkCode(t, "create star", createStar(e, p, "1", "1"), 200)
 	checkCode(t, "create star non-existent user", createStar(e, p, "100", "1"), 404)
 	checkCode(t, "create star non-existent post", createStar(e, p, "1", "100"), 404)
