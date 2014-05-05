@@ -42,3 +42,8 @@ func (db *MyDb) GetNumStars(postId int64) (int, error) {
 	count, err := db.SelectInt("select count(*) from stars where post_id=$1", postId)
 	return int(count), err
 }
+
+func (db *MyDb) GetStarByUser(postId int64, userId string) (int, error) {
+	count, err := db.SelectInt("select count(*) from stars where (post_id=$1 and user_id=$2)", postId, userId)
+	return int(count), err
+}

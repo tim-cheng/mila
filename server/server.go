@@ -170,6 +170,7 @@ func startServer() {
 				p := posts[i].(*Post)
 				nComments, _ := myDb.GetNumComments(p.Id)
 				nStars, _ := myDb.GetNumStars(p.Id)
+				nSelfStar, _ := myDb.GetStarByUser(p.Id, req.FormValue("user_id"))
 				retPosts[i] = map[string]interface{}{
 					"id":           p.Id,
 					"user_id":      p.UserId,
@@ -177,6 +178,7 @@ func startServer() {
 					"created_at":   p.CreatedAt,
 					"num_comments": nComments,
 					"num_stars":    nStars,
+					"self_star":    nSelfStar,
 				}
 			}
 			r.JSON(200, retPosts)
