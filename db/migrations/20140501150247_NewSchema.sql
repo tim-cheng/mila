@@ -13,7 +13,7 @@ CREATE TABLE users (
   num_degree1 integer,
   num_degree2 integer,
   description varchar(128),
-  picture_url varchar(1024)
+  picture bytea
 );
 
 CREATE TABLE connections (
@@ -28,7 +28,7 @@ CREATE TABLE posts (
   created_at timestamp,
   user_id integer REFERENCES users,
   body text,
-  picture_url varchar(1024)
+  picture bytea
 );
 
 CREATE TABLE stars (

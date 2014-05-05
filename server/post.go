@@ -7,11 +7,11 @@ import (
 )
 
 type Post struct {
-	Id         int64     `db:"id"`
-	CreatedAt  time.Time `db:"created_at"`
-	UserId     int64     `db:"user_id"`
-	Body       string    `db:"body"`
-	PictureUrl string    `db:"picture_url"`
+	Id        int64     `db:"id"`
+	CreatedAt time.Time `db:"created_at"`
+	UserId    int64     `db:"user_id"`
+	Body      string    `db:"body"`
+	Picture   []byte    `db:"picture"`
 }
 
 // Validation Hooks
@@ -44,10 +44,10 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 
 	var posts []interface{}
 	if degree == "" || degree == "0" {
-		posts, err = db.Select(Post{}, "select * from posts where user_id=$1", id)
+		posts, err = db.Select(Post{}, "select id, created_at, user_id, body from posts where user_id=$1", id)
 	} else if degree == "1" {
 		posts, err = db.Select(Post{},
-			"select * from posts where user_id in "+
+			"select id, created_at, user_id, body from posts where user_id in "+
 				"(select $1 UNION (select user2_id from connections where user1_id=$1) "+
 				"UNION (select user1_id from connections where user2_id=$1)) "+
 				"order by created_at desc", id)

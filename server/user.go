@@ -19,7 +19,7 @@ type User struct {
 	NumDegree1  int64     `db:"num_degree1"`
 	NumDegree2  int64     `db:"num_degree2"`
 	Description string    `db:"description"`
-	PictureUrl  string    `db:"picture_url"`
+	Picture     []byte    `db:"picture"`
 }
 
 // Validation Hooks
@@ -52,13 +52,13 @@ func (db *MyDb) GetUser(userId string) (*User, error) {
 		return nil, err
 	}
 	u := new(User)
-	err = db.SelectOne(u, "select * from users where id=$1", id)
+	err = db.SelectOne(u, "select id, created_at, email, first_name, last_name, num_degree1, num_degree2, description from users where id=$1", id)
 	return u, err
 }
 
 func (db *MyDb) GetUserByEmail(email string) (*User, error) {
 	u := new(User)
-	err := db.SelectOne(u, "select * from users where email=$1", email)
+	err := db.SelectOne(u, "select id, created_at, email, first_name, last_name, num_degree1, num_degree2, description from users where email=$1", email)
 	return u, err
 }
 
