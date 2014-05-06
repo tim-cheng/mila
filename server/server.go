@@ -6,9 +6,8 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/tim-cheng/mila/server/models"
-	"io/ioutil"
+	"github.com/tim-cheng/mila/server/routes"
 	"net/http"
-	"strconv"
 )
 
 var myDb *models.MyDb
@@ -22,25 +21,14 @@ func Secret(user, realm string) string {
 	}
 }
 
-
-// injection example (injecting username), not used
-type authUser struct {
-	User string
-}
-type AuthUser interface {
-	GetUser() string
-}
-
-func (au *authUser) GetUser() string {
-	return au.User
-}
-
 func startServer() {
 	myDb = models.NewDb()
 	defer myDb.Db.Close()
 
 	m := martini.Classic()
 	m.Use(render.Renderer())
+
+  router := routes.New(myDb)
 
 	// authentication
 	basicAuth := auth.NewBasicAuthenticator("mila.com", Secret)
@@ -49,274 +37,38 @@ func startServer() {
 	})
 	//m.Use(authFunc)
 
-	// request level injection example
-	m.Use(func(req *http.Request, c martini.Context) {
-		// inject to interface (override existing interface)
-		//c.MapTo(&authUser{basicAuth.CheckAuth(req)}, (*AuthUser)(nil))
-		// inject to struct
-		c.Map(&authUser{basicAuth.CheckAuth(req)})
-	})
-
 	// Routes
 	m.Get("/", func() string {
 		return "Welcome to Mila"
 	})
 
-	// login
-	m.Get("/login", authFunc, func(r render.Render, req *http.Request) {
+	m.Get("/login", authFunc, func (c martini.Context, req *http.Request) {
 		email := basicAuth.CheckAuth(req)
 		user, err := myDb.GetUserByEmail(email)
-		fmt.Println("email: ", email, " user.id = ", user.Id)
 		if err == nil {
-			r.JSON(200, map[string]interface{}{
-				"id": user.Id,
-			})
+			c.Map(user)
 		} else {
-			r.JSON(500, nil)
+			c.Map((*models.User)(nil))
 		}
-	})
+	}, router.Login)
 
-	// users
-	m.Get("/users/:id", authFunc, func(params martini.Params, r render.Render) {
-		user, err := myDb.GetUser(params["id"])
-		if err == nil {
-			nConn, _ := myDb.GetNumConnections(user.Id)
-			r.JSON(200, map[string]interface{}{
-				"id":          user.Id,
-				"first_name":  user.FirstName,
-				"last_name":   user.LastName,
-				"email":       user.Email,
-				"description": user.Description,
-				"num_degree1": nConn,
-				"num_degree2": user.NumDegree2,
-			})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "User not found " + err.Error(),
-			})
-		}
-	})
-
-	m.Post("/users/:id/picture", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		user, err := myDb.GetUser(params["id"])
-		if err != nil {
-			r.JSON(404, map[string]interface{}{
-				"message": "User not found " + err.Error(),
-			})
-			return
-		}
-		buf, err := ioutil.ReadAll(req.Body)
-
-		if err != nil {
-			r.JSON(404, map[string]interface{}{
-				"message": "failed to read picture " + err.Error(),
-			})
-			return
-		}
-		err = myDb.PostUserPicture(user.Id, buf)
-		if err == nil {
-			r.JSON(201, map[string]interface{}{"id": user.Id})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "failed to save picture " + err.Error(),
-			})
-		}
-	})
-
+	m.Get("/users/:id", authFunc, router.GetUser)
+	m.Post("/users/:id/picture", authFunc, router.PostUserPicture)
 	// TODO: get image doesn't require basic auth to make it easier to fetch/cache
-	m.Get("/users/:id/picture", func(params martini.Params, r render.Render, w http.ResponseWriter) {
-		user, err := myDb.GetUser(params["id"])
-		if err != nil {
-			r.JSON(404, map[string]interface{}{
-				"message": "User not found " + err.Error(),
-			})
-			return
-		}
-		image, err := myDb.GetUserPicture(user.Id)
-		if err == nil {
-			w.Header().Set("Content-Type", "image/jpeg")
-			w.Header().Set("Content-Length", strconv.Itoa(len(image)))
-			w.Write(image)
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "failed to retrieve picture " + err.Error(),
-			})
-		}
-	})
+	m.Get("/users/:id/picture", router.GetUserPicture)
+	m.Post("/users", router.PostUser)
 
-	m.Post("/users", func(r render.Render, req *http.Request) {
-		user, err := myDb.NewUser(
-			"email",
-			req.FormValue("email"),
-			req.FormValue("password"),
-			req.FormValue("first_name"),
-			req.FormValue("last_name"),
-		)
+	m.Post("/connections", authFunc, router.PostConnection)
+	m.Delete("/connections", authFunc, router.DeleteConnection)
 
-		if err == nil {
-			err = myDb.PostUser(user)
-		}
-		if err == nil {
-			r.JSON(201, map[string]interface{}{
-				"id": user.Id,
-			})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to add user " + err.Error(),
-			})
-		}
-	})
+	m.Post("/posts", authFunc, router.PostPost)
+	m.Get("/posts", authFunc, router.GetPosts)
 
-	// connections
-	m.Post("/connections", authFunc, func(r render.Render, req *http.Request) {
-		conn, err := myDb.NewConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
-		if err == nil {
-			err = myDb.PostConnection(conn)
-		}
-		if err == nil {
-			r.JSON(201, map[string]interface{}{
-				"user1_id": conn.User1Id,
-				"user2_id": conn.User2Id,
-			})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to add connection " + err.Error(),
-			})
-		}
-	})
+	m.Post("/posts/:id/comments", authFunc, router.PostComment)
+	m.Get("/posts/:id/comments", authFunc, router.GetComments)
 
-	m.Delete("/connections", authFunc, func(r render.Render, req *http.Request) {
-		err := myDb.DeleteConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
-		if err == nil {
-			r.JSON(200, nil)
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to delete connection " + err.Error(),
-			})
-		}
-	})
-
-	// posts
-	m.Post("/posts", authFunc, func(r render.Render, req *http.Request) {
-		post, err := myDb.NewPost(req.FormValue("user_id"), req.FormValue("body"))
-		if err == nil {
-			err = myDb.PostPost(post)
-		}
-		if err == nil {
-			r.JSON(201, map[string]interface{}{
-				"id": post.Id,
-			})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to add post " + err.Error(),
-			})
-		}
-	})
-
-	m.Get("/posts", authFunc, func(r render.Render, req *http.Request) {
-		posts, err := myDb.GetPosts(req.FormValue("user_id"), req.FormValue("degree"))
-		if err == nil && len(posts) > 0 {
-			retPosts := make([]map[string]interface{}, len(posts))
-			for i := range posts {
-				p := posts[i].(*models.Post)
-				nComments, _ := myDb.GetNumComments(p.Id)
-				nStars, _ := myDb.GetNumStars(p.Id)
-				nSelfStar, _ := myDb.GetStarByUser(p.Id, req.FormValue("user_id"))
-				retPosts[i] = map[string]interface{}{
-					"id":           p.Id,
-					"user_id":      p.UserId,
-					"body":         p.Body,
-					"created_at":   p.CreatedAt,
-					"num_comments": nComments,
-					"num_stars":    nStars,
-					"self_star":    nSelfStar,
-				}
-			}
-			r.JSON(200, retPosts)
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to get posts ",
-			})
-		}
-	})
-
-	// comments
-	m.Post("/posts/:id/comments", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		c, err := myDb.NewComemnt(
-			req.FormValue("user_id"),
-			params["id"],
-			req.FormValue("body"),
-		)
-		if err == nil {
-			err = myDb.PostComment(c)
-		}
-		if err == nil {
-			r.JSON(201, map[string]interface{}{
-				"id": c.Id,
-			})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to add comment " + err.Error(),
-			})
-		}
-	})
-
-	m.Get("/posts/:id/comments", authFunc, func(params martini.Params, r render.Render) {
-		comments, err := myDb.GetComments(params["id"])
-		if err == nil && len(comments) > 0 {
-			retComments := make([]map[string]interface{}, len(comments))
-			for i := range comments {
-				c := comments[i].(*models.Comment)
-				retComments[i] = map[string]interface{}{
-					"id":         c.Id,
-					"user_id":    c.UserId,
-					"post_id":    c.PostId,
-					"body":       c.Body,
-					"created_at": c.CreatedAt,
-				}
-			}
-			r.JSON(200, retComments)
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to get comments",
-			})
-		}
-	})
-
-	// stars
-	m.Put("/posts/:id/stars", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		s, err := myDb.NewStar(
-			req.FormValue("user_id"),
-			params["id"],
-		)
-		if err == nil {
-			err = myDb.PutStar(s)
-		}
-		if err == nil {
-			r.JSON(200, nil)
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to add star " + err.Error(),
-			})
-		}
-	})
-
-	m.Delete("/posts/:id/stars", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		s, err := myDb.NewStar(
-			req.FormValue("user_id"),
-			params["id"],
-		)
-		if err == nil {
-			err = myDb.DeleteStar(s)
-		}
-		if err == nil {
-			r.JSON(200, nil)
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to delete star " + err.Error(),
-			})
-		}
-	})
+	m.Put("/posts/:id/stars", authFunc, router.PutStar)
+	m.Delete("/posts/:id/stars", authFunc, router.DeleteStar)
 
 	http.ListenAndServe(":8080", m)
 }
