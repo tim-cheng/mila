@@ -67,6 +67,20 @@ func (db *MyDb) PostUser(user *User) error {
 	return err
 }
 
+func (db *MyDb) PostUserPicture(userId int64, image []byte) error {
+	u := new(User)
+	err := db.SelectOne(u, "select * from users where id=$1", userId)
+	u.Picture = image
+	_, err = db.Update(u)
+	return err
+}
+
+func (db *MyDb) GetUserPicture(userId int64) ([]byte, error) {
+	u := new(User)
+	err := db.SelectOne(u, "select picture from users where id=$1", userId)
+	return u.Picture, err
+}
+
 func (db *MyDb) GetPassword(email string) (string, error) {
 	p := ""
 	err := db.SelectOne(&p, "select password from users where email=$1", email)

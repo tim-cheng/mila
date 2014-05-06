@@ -6,6 +6,8 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"net/http"
+	"io/ioutil"
+	"strconv"
 )
 
 var myDb *MyDb
@@ -89,6 +91,52 @@ func startServer() {
 		} else {
 			r.JSON(404, map[string]interface{}{
 				"message": "User not found " + err.Error(),
+			})
+		}
+	})
+
+	m.Post("/users/:id/picture", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
+		user, err := myDb.GetUser(params["id"])
+		if (err != nil) {
+			r.JSON(404, map[string]interface{}{
+				"message": "User not found " + err.Error(),
+			})
+			return
+		}
+		buf, err := ioutil.ReadAll(req.Body)
+
+		if (err != nil) {
+			r.JSON(404, map[string]interface{}{
+				"message": "failed to read picture " + err.Error(),
+			})
+			return
+		}
+		err = myDb.PostUserPicture(user.Id, buf)
+		if (err == nil) {
+			r.JSON(201, map[string]interface{}{ "id": user.Id })
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "failed to save picture " + err.Error(),
+			})
+		}
+  })
+
+	m.Get("/users/:id/picture", func(params martini.Params, r render.Render, w http.ResponseWriter) {
+		user, err := myDb.GetUser(params["id"])
+		if (err != nil) {
+			r.JSON(404, map[string]interface{}{
+				"message": "User not found " + err.Error(),
+			})
+			return
+		}
+		image, err := myDb.GetUserPicture(user.Id)
+		if (err == nil) {
+			w.Header().Set("Content-Type", "image/jpeg")
+			w.Header().Set("Content-Length", strconv.Itoa(len(image)))
+			w.Write(image)
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "failed to retrieve picture " + err.Error(),
 			})
 		}
 	})

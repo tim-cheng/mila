@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	//"fmt"
-	//"io/ioutil"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -28,12 +28,30 @@ func testClient(email, password, method, path, params string) int {
 	if err != nil {
 		return 0
 	}
-	//fmt.Printf("req: %s\nresp: %v\nerr: %v\n", path, resp, err)
-	//contents, err := ioutil.ReadAll(resp.Body)
-	//if err == nil {
-	//  fmt.Println(string(contents))
-	//}
+	return resp.StatusCode
+}
 
+func testPostImage(email, password, path, filename string) int {
+	client := &http.Client{}
+
+	buf, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return 0
+	}
+
+	req, err := http.NewRequest("POST", "http://localhost:8080"+path, bytes.NewReader(buf))
+	if err != nil {
+		return 0
+	}
+	if email != "" {
+		req.SetBasicAuth(email, password)
+	}
+	req.Header.Add("Content-Type", "image/jpeg")
+	req.Header.Add("Content-Length", strconv.Itoa(len(buf)))
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0
+	}
 	return resp.StatusCode
 }
 
@@ -89,6 +107,7 @@ func checkCode(t *testing.T, msg string, code int, expect int) {
 		t.Errorf("failed: expect %d, got %d\n", expect, code)
 	}
 }
+
 
 func TestBasic(t *testing.T) {
 	go startServer()
@@ -162,4 +181,6 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "get posts without user_id", testClient(e, p, "GET", "/posts", ""), 404)
 	checkCode(t, "get posts with invalid user_id", testClient(e, p, "GET", "/posts?user_id=abc", ""), 404)
 
+	checkCode(t, "post profile picture", testPostImage(e, p, "/users/1/picture", "./sherry.jpg"), 201)
+	checkCode(t, "get profile picture", testClient(e, p, "GET", "/users/1/picture", ""), 200)
 }
