@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	//  "fmt"
@@ -10,7 +10,7 @@ type Star struct {
 	UserId int64 `db:"user_id"`
 }
 
-func (db *MyDb) newStar(userId, postId string) (*Star, error) {
+func (db *MyDb) NewStar(userId, postId string) (*Star, error) {
 	uId, err := db.validateUserId(userId)
 	if err != nil {
 		return nil, err

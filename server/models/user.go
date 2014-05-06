@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ func (u *User) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) newUser(typ, email, password, firstName, lastName string) (*User, error) {
+func (db *MyDb) NewUser(typ, email, password, firstName, lastName string) (*User, error) {
 
 	// generate hash
 	hashQuery := fmt.Sprintf("select crypt('%s', gen_salt('md5'))", password)

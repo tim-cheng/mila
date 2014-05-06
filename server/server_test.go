@@ -180,8 +180,8 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "get posts without user_id", testClient(e, p, "GET", "/posts", ""), 404)
 	checkCode(t, "get posts with invalid user_id", testClient(e, p, "GET", "/posts?user_id=abc", ""), 404)
 
-	checkCode(t, "post profile picture", testPostImage(e, p, "/users/1/picture", "./sherry.jpg"), 201)
-	checkCode(t, "post profile picture", testPostImage(e, p, "/users/2/picture", "./tim.jpg"), 201)
+	checkCode(t, "post profile picture", testPostImage(e, p, "/users/1/picture", "./tests/sherry.jpg"), 201)
+	checkCode(t, "post profile picture", testPostImage(e, p, "/users/2/picture", "./tests/tim.jpg"), 201)
 	checkCode(t, "get profile picture", testClient(e, p, "GET", "/users/1/picture", ""), 200)
 	checkCode(t, "get profile picture", testClient(e, p, "GET", "/users/2/picture", ""), 200)
 }

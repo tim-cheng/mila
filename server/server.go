@@ -5,12 +5,13 @@ import (
 	auth "github.com/abbot/go-http-auth"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"github.com/tim-cheng/mila/server/models"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 )
 
-var myDb *MyDb
+var myDb *models.MyDb
 
 func Secret(user, realm string) string {
 	p, err := myDb.GetPassword(user)
@@ -20,6 +21,7 @@ func Secret(user, realm string) string {
 		return p
 	}
 }
+
 
 // injection example (injecting username), not used
 type authUser struct {
@@ -34,7 +36,7 @@ func (au *authUser) GetUser() string {
 }
 
 func startServer() {
-	myDb = NewDb()
+	myDb = models.NewDb()
 	defer myDb.Db.Close()
 
 	m := martini.Classic()
@@ -143,7 +145,7 @@ func startServer() {
 	})
 
 	m.Post("/users", func(r render.Render, req *http.Request) {
-		user, err := myDb.newUser(
+		user, err := myDb.NewUser(
 			"email",
 			req.FormValue("email"),
 			req.FormValue("password"),
@@ -167,7 +169,7 @@ func startServer() {
 
 	// connections
 	m.Post("/connections", authFunc, func(r render.Render, req *http.Request) {
-		conn, err := myDb.newConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
+		conn, err := myDb.NewConnection(req.FormValue("user1_id"), req.FormValue("user2_id"))
 		if err == nil {
 			err = myDb.PostConnection(conn)
 		}
@@ -196,7 +198,7 @@ func startServer() {
 
 	// posts
 	m.Post("/posts", authFunc, func(r render.Render, req *http.Request) {
-		post, err := myDb.newPost(req.FormValue("user_id"), req.FormValue("body"))
+		post, err := myDb.NewPost(req.FormValue("user_id"), req.FormValue("body"))
 		if err == nil {
 			err = myDb.PostPost(post)
 		}
@@ -216,7 +218,7 @@ func startServer() {
 		if err == nil && len(posts) > 0 {
 			retPosts := make([]map[string]interface{}, len(posts))
 			for i := range posts {
-				p := posts[i].(*Post)
+				p := posts[i].(*models.Post)
 				nComments, _ := myDb.GetNumComments(p.Id)
 				nStars, _ := myDb.GetNumStars(p.Id)
 				nSelfStar, _ := myDb.GetStarByUser(p.Id, req.FormValue("user_id"))
@@ -240,7 +242,7 @@ func startServer() {
 
 	// comments
 	m.Post("/posts/:id/comments", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		c, err := myDb.newComemnt(
+		c, err := myDb.NewComemnt(
 			req.FormValue("user_id"),
 			params["id"],
 			req.FormValue("body"),
@@ -264,7 +266,7 @@ func startServer() {
 		if err == nil && len(comments) > 0 {
 			retComments := make([]map[string]interface{}, len(comments))
 			for i := range comments {
-				c := comments[i].(*Comment)
+				c := comments[i].(*models.Comment)
 				retComments[i] = map[string]interface{}{
 					"id":         c.Id,
 					"user_id":    c.UserId,
@@ -283,7 +285,7 @@ func startServer() {
 
 	// stars
 	m.Put("/posts/:id/stars", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		s, err := myDb.newStar(
+		s, err := myDb.NewStar(
 			req.FormValue("user_id"),
 			params["id"],
 		)
@@ -300,7 +302,7 @@ func startServer() {
 	})
 
 	m.Delete("/posts/:id/stars", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
-		s, err := myDb.newStar(
+		s, err := myDb.NewStar(
 			req.FormValue("user_id"),
 			params["id"],
 		)

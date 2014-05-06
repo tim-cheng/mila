@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"github.com/coopernurse/gorp"
@@ -19,7 +19,7 @@ func (c *Comment) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) newComemnt(userId, postId, content string) (*Comment, error) {
+func (db *MyDb) NewComemnt(userId, postId, content string) (*Comment, error) {
 	uId, err := db.validateUserId(userId)
 	if err != nil {
 		return nil, err

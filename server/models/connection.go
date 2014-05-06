@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"github.com/coopernurse/gorp"
@@ -17,7 +17,7 @@ func (c *Connection) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) newConnection(user1Id, user2Id string) (*Connection, error) {
+func (db *MyDb) NewConnection(user1Id, user2Id string) (*Connection, error) {
 	id1, id2, err := db.validateConnectionId(user1Id, user2Id)
 	if err != nil {
 		return nil, err

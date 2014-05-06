@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"errors"
@@ -20,7 +20,7 @@ func (p *Post) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) newPost(userId, content string) (*Post, error) {
+func (db *MyDb) NewPost(userId, content string) (*Post, error) {
 	id, err := db.validateUserId(userId)
 	if err != nil {
 		return nil, err
