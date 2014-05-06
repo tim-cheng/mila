@@ -108,7 +108,6 @@ func checkCode(t *testing.T, msg string, code int, expect int) {
 	}
 }
 
-
 func TestBasic(t *testing.T) {
 	go startServer()
 	time.Sleep(time.Second * 2)

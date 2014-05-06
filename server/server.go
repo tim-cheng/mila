@@ -5,8 +5,8 @@ import (
 	auth "github.com/abbot/go-http-auth"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 	"strconv"
 )
 
@@ -97,7 +97,7 @@ func startServer() {
 
 	m.Post("/users/:id/picture", authFunc, func(params martini.Params, r render.Render, req *http.Request) {
 		user, err := myDb.GetUser(params["id"])
-		if (err != nil) {
+		if err != nil {
 			r.JSON(404, map[string]interface{}{
 				"message": "User not found " + err.Error(),
 			})
@@ -105,32 +105,33 @@ func startServer() {
 		}
 		buf, err := ioutil.ReadAll(req.Body)
 
-		if (err != nil) {
+		if err != nil {
 			r.JSON(404, map[string]interface{}{
 				"message": "failed to read picture " + err.Error(),
 			})
 			return
 		}
 		err = myDb.PostUserPicture(user.Id, buf)
-		if (err == nil) {
-			r.JSON(201, map[string]interface{}{ "id": user.Id })
+		if err == nil {
+			r.JSON(201, map[string]interface{}{"id": user.Id})
 		} else {
 			r.JSON(404, map[string]interface{}{
 				"message": "failed to save picture " + err.Error(),
 			})
 		}
-  })
+	})
 
+	// TODO: get image doesn't require basic auth to make it easier to fetch/cache
 	m.Get("/users/:id/picture", func(params martini.Params, r render.Render, w http.ResponseWriter) {
 		user, err := myDb.GetUser(params["id"])
-		if (err != nil) {
+		if err != nil {
 			r.JSON(404, map[string]interface{}{
 				"message": "User not found " + err.Error(),
 			})
 			return
 		}
 		image, err := myDb.GetUserPicture(user.Id)
-		if (err == nil) {
+		if err == nil {
 			w.Header().Set("Content-Type", "image/jpeg")
 			w.Header().Set("Content-Length", strconv.Itoa(len(image)))
 			w.Write(image)
