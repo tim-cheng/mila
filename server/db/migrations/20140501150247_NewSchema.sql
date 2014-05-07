@@ -10,6 +10,7 @@ CREATE TABLE users (
   admin boolean NOT NULL,
   first_name varchar(32) NOT NULL,
   last_name varchar(32) NOT NULL,
+  fb_id varchar(32),
   num_degree1 integer,
   num_degree2 integer,
   description varchar(128),

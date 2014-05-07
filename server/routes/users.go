@@ -55,7 +55,19 @@ func (rt *Routes) Login(req *http.Request, r render.Render) {
 	}
 }
 
-func (rt *Routes) LoginFacebook(params martini.Params, r render.Render, req *http.Request) {
+func (rt *Routes) downloadFacebookPicture(userId int64, fbId string) {
+	// upload facebook picture
+	res, err := http.Get("https://graph.facebook.com/" + fbId + "/picture?type=small")
+	if err == nil {
+		buf, err := ioutil.ReadAll(res.Body)
+		if err == nil {
+			err = rt.Db.PostUserPicture(userId, buf)
+			fmt.Printf("upload fb picture, buflen= %d, err=%v\n", len(buf), err)
+		}
+	}
+}
+
+func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
 	email, password, err := basicAuth(req)
 	if err != nil {
 		r.JSON(500, nil)
@@ -75,13 +87,15 @@ func (rt *Routes) LoginFacebook(params martini.Params, r render.Render, req *htt
 			"facebook",
 			email+"@fb",
 			"fAcEbOoK",
-			params["first_name"],
-			params["last_name"],
+			req.FormValue("first_name"),
+			req.FormValue("last_name"),
+			req.FormValue("fb_id"),
 		)
 		if err == nil {
 			err = rt.Db.PostUser(user)
 		}
 		if err == nil {
+			go rt.downloadFacebookPicture(user.Id, req.FormValue("fb_id"))
 			r.JSON(201, map[string]interface{}{
 				"id": user.Id,
 			})
@@ -166,6 +180,7 @@ func (rt *Routes) PostUser(r render.Render, req *http.Request) {
 		req.FormValue("password"),
 		req.FormValue("first_name"),
 		req.FormValue("last_name"),
+		"",
 	)
 
 	if err == nil {

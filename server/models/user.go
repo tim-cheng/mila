@@ -13,6 +13,7 @@ type User struct {
 	Email       string    `db:"email"`
 	Password    string    `db:"password"`
 	Type        string    `db:"type"`
+	FbId        string    `db:"fb_id"`
 	Admin       bool      `db:"admin"`
 	FirstName   string    `db:"first_name"`
 	LastName    string    `db:"last_name"`
@@ -28,7 +29,7 @@ func (u *User) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) NewUser(typ, email, password, firstName, lastName string) (*User, error) {
+func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id string) (*User, error) {
 
 	// generate hash
 	hashQuery := fmt.Sprintf("select crypt('%s', gen_salt('md5'))", password)
@@ -43,6 +44,7 @@ func (db *MyDb) NewUser(typ, email, password, firstName, lastName string) (*User
 		FirstName:   firstName,
 		LastName:    lastName,
 		Description: "proud parent",
+		FbId:        fb_id,
 	}, nil
 }
 
@@ -52,13 +54,13 @@ func (db *MyDb) GetUser(userId string) (*User, error) {
 		return nil, err
 	}
 	u := new(User)
-	err = db.SelectOne(u, "select id, created_at, email, first_name, last_name, num_degree1, num_degree2, description from users where id=$1", id)
+	err = db.SelectOne(u, "select id, created_at, email, type, first_name, last_name, num_degree1, num_degree2, description from users where id=$1", id)
 	return u, err
 }
 
 func (db *MyDb) GetUserByEmail(email string) (*User, error) {
 	u := new(User)
-	err := db.SelectOne(u, "select id, created_at, email, first_name, last_name, num_degree1, num_degree2, description from users where email=$1", email)
+	err := db.SelectOne(u, "select id, created_at, email, type, first_name, last_name, num_degree1, num_degree2, description from users where email=$1", email)
 	if err != nil {
 		return nil, err
 	}
