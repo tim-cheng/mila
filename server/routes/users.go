@@ -1,15 +1,51 @@
 package routes
 
 import (
+	"encoding/base64"
+	"errors"
+	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
-	"github.com/tim-cheng/mila/server/models"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
-func (rt *Routes) Login(user *models.User, r render.Render) {
+// from https://codereview.appspot.com/76540043/patch/80001/90001
+func basicAuth(r *http.Request) (username, password string, err error) {
+	auth := r.Header.Get("Authorization")
+	if auth == "" {
+		return "", "", errors.New("no Authorization header")
+	}
+	return parseBasicAuth(auth)
+}
+
+func parseBasicAuth(auth string) (username, password string, err error) {
+	s1 := strings.SplitN(auth, " ", 2)
+	if len(s1) != 2 {
+		return "", "", errors.New("failed to parse authentication string")
+	}
+	if s1[0] != "Basic" {
+		return "", "", fmt.Errorf("authorization scheme is %v, not Basic", s1[0])
+	}
+	c, err := base64.StdEncoding.DecodeString(s1[1])
+	if err != nil {
+		return "", "", errors.New("failed to parse base64 basic credentials")
+	}
+	s2 := strings.SplitN(string(c), ":", 2)
+	if len(s2) != 2 {
+		return "", "", errors.New("failed to parse basic credentials")
+	}
+	return s2[0], s2[1], nil
+}
+
+func (rt *Routes) Login(req *http.Request, r render.Render) {
+	email, _, err := basicAuth(req)
+	if err != nil {
+		r.JSON(500, nil)
+	}
+	user, err := rt.Db.GetUserByEmail(email)
 	if user != nil {
 		r.JSON(200, map[string]interface{}{
 			"id": user.Id,
