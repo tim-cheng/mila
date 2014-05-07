@@ -1,13 +1,13 @@
 package routes
 
 import (
-  "github.com/tim-cheng/mila/server/models"
+	"github.com/tim-cheng/mila/server/models"
 )
 
 type Routes struct {
-  Db *models.MyDb
+	Db *models.MyDb
 }
 
 func New(db *models.MyDb) *Routes {
-  return &Routes{db}
+	return &Routes{db}
 }

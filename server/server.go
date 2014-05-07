@@ -28,7 +28,7 @@ func startServer() {
 	m := martini.Classic()
 	m.Use(render.Renderer())
 
-  router := routes.New(myDb)
+	router := routes.New(myDb)
 
 	// authentication
 	basicAuth := auth.NewBasicAuthenticator("mila.com", Secret)
@@ -42,7 +42,7 @@ func startServer() {
 		return "Welcome to Mila"
 	})
 
-	m.Get("/login", authFunc, func (c martini.Context, req *http.Request) {
+	m.Get("/login", authFunc, func(c martini.Context, req *http.Request) {
 		email := basicAuth.CheckAuth(req)
 		user, err := myDb.GetUserByEmail(email)
 		if err == nil {
@@ -60,6 +60,9 @@ func startServer() {
 
 	m.Post("/connections", authFunc, router.PostConnection)
 	m.Delete("/connections", authFunc, router.DeleteConnection)
+
+	m.Post("/posts/:id/picture", authFunc, router.PostPostPicture)
+	m.Get("/posts/:id/picture", authFunc, router.GetPostPicture)
 
 	m.Post("/posts", authFunc, router.PostPost)
 	m.Get("/posts", authFunc, router.GetPosts)

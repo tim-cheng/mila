@@ -57,3 +57,25 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 
 	return posts, err
 }
+
+func (db *MyDb) PostPostPicture(postId string, image []byte) error {
+	pId, err := db.validatePostId(postId)
+	if err != nil {
+		return err
+	}
+	p := new(Post)
+	err = db.SelectOne(p, "select id, created_at, user_id, body from posts where id=$1", pId)
+	p.Picture = image
+	_, err = db.Update(p)
+	return err
+}
+
+func (db *MyDb) GetPostPicture(postId string) ([]byte, error) {
+	pId, err := db.validatePostId(postId)
+	if err != nil {
+		return nil, err
+	}
+	p := new(Post)
+	err = db.SelectOne(p, "select picture from posts where id=$1", pId)
+	return p.Picture, err
+}

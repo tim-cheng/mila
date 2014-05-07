@@ -184,4 +184,7 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "post profile picture", testPostImage(e, p, "/users/2/picture", "./tests/tim.jpg"), 201)
 	checkCode(t, "get profile picture", testClient(e, p, "GET", "/users/1/picture", ""), 200)
 	checkCode(t, "get profile picture", testClient(e, p, "GET", "/users/2/picture", ""), 200)
+
+	checkCode(t, "post post picture", testPostImage(e, p, "/posts/1/picture", "./tests/post1.jpg"), 201)
+	checkCode(t, "get post picture", testClient(e, p, "GET", "/posts/1/picture", ""), 200)
 }
