@@ -55,6 +55,44 @@ func (rt *Routes) Login(req *http.Request, r render.Render) {
 	}
 }
 
+func (rt *Routes) LoginFacebook(params martini.Params, r render.Render, req *http.Request) {
+	email, password, err := basicAuth(req)
+	if err != nil {
+		r.JSON(500, nil)
+	}
+	fmt.Printf("auth fb: %v, %v\n", email, password)
+
+	// TODO: validate password/access_token with FB graph API
+
+	user, err := rt.Db.GetUserByEmail(email + "@fb")
+	if user != nil && err == nil {
+		r.JSON(200, map[string]interface{}{
+			"id": user.Id,
+		})
+	} else {
+		// need to create the user
+		user, err = rt.Db.NewUser(
+			"facebook",
+			email+"@fb",
+			"fAcEbOoK",
+			params["first_name"],
+			params["last_name"],
+		)
+		if err == nil {
+			err = rt.Db.PostUser(user)
+		}
+		if err == nil {
+			r.JSON(201, map[string]interface{}{
+				"id": user.Id,
+			})
+		} else {
+			r.JSON(404, map[string]interface{}{
+				"message": "Failed to add user " + err.Error(),
+			})
+		}
+	}
+}
+
 func (rt *Routes) GetUser(params martini.Params, r render.Render) {
 	user, err := rt.Db.GetUser(params["id"])
 	if err == nil {

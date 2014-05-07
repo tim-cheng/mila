@@ -43,7 +43,7 @@ func startServer() {
 	})
 
 	m.Get("/login", authFunc, router.Login)
-	//	m.Get("/login_facebook", router.LoginFacebook)
+	m.Get("/login_facebook", router.LoginFacebook)
 
 	m.Get("/users/:id", authFunc, router.GetUser)
 	m.Post("/users/:id/picture", authFunc, router.PostUserPicture)
