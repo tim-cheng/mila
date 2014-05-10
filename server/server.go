@@ -55,7 +55,8 @@ func startServer() {
 	m.Delete("/connections", authFunc, router.DeleteConnection)
 
 	m.Post("/posts/:id/picture", authFunc, router.PostPostPicture)
-	m.Get("/posts/:id/picture", authFunc, router.GetPostPicture)
+	// TODO: permission for post pictures?
+	m.Get("/posts/:id/picture", router.GetPostPicture)
 
 	m.Post("/posts", authFunc, router.PostPost)
 	m.Get("/posts", authFunc, router.GetPosts)
