@@ -42,6 +42,7 @@ func (rt *Routes) GetPosts(r render.Render, req *http.Request) {
 				"num_comments": nComments,
 				"num_stars":    nStars,
 				"self_star":    nSelfStar,
+				"has_picture":  p.HasPicture,
 			}
 		}
 		r.JSON(200, retPosts)

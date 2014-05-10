@@ -29,7 +29,8 @@ CREATE TABLE posts (
   created_at timestamp,
   user_id integer REFERENCES users,
   body text,
-  picture bytea
+  picture bytea,
+  has_picture boolean
 );
 
 CREATE TABLE stars (
