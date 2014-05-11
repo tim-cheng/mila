@@ -10,7 +10,7 @@ import (
 )
 
 func (rt *Routes) PostPost(r render.Render, req *http.Request) {
-	post, err := rt.Db.NewPost(req.FormValue("user_id"), req.FormValue("body"))
+	post, err := rt.Db.NewPost(req.FormValue("user_id"), req.FormValue("body"), req.FormValue("bg_color"))
 	if err == nil {
 		err = rt.Db.PostPost(post)
 	}
@@ -38,6 +38,7 @@ func (rt *Routes) GetPosts(r render.Render, req *http.Request) {
 				"id":           p.Id,
 				"user_id":      p.UserId,
 				"body":         p.Body,
+				"bg_color":     p.BgColor,
 				"created_at":   p.CreatedAt,
 				"num_comments": nComments,
 				"num_stars":    nStars,

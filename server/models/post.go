@@ -11,6 +11,7 @@ type Post struct {
 	CreatedAt  time.Time `db:"created_at"`
 	UserId     int64     `db:"user_id"`
 	Body       string    `db:"body"`
+	BgColor    string    `db:"bg_color"`
 	Picture    []byte    `db:"picture"`
 	HasPicture bool      `db:"has_picture"`
 }
@@ -21,7 +22,7 @@ func (p *Post) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) NewPost(userId, content string) (*Post, error) {
+func (db *MyDb) NewPost(userId, content, bgcolor string) (*Post, error) {
 	id, err := db.validateUserId(userId)
 	if err != nil {
 		return nil, err
@@ -29,6 +30,7 @@ func (db *MyDb) NewPost(userId, content string) (*Post, error) {
 	return &Post{
 		UserId: id,
 		Body:   content,
+		BgColor: bgcolor,
 	}, nil
 }
 
@@ -45,10 +47,10 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 
 	var posts []interface{}
 	if degree == "" || degree == "0" {
-		posts, err = db.Select(Post{}, "select id, created_at, user_id, body, has_picture from posts where user_id=$1", id)
+		posts, err = db.Select(Post{}, "select id, created_at, user_id, body, bg_color, has_picture from posts where user_id=$1", id)
 	} else if degree == "1" {
 		posts, err = db.Select(Post{},
-			"select id, created_at, user_id, body, has_picture from posts where user_id in "+
+			"select id, created_at, user_id, body, bg_color, has_picture from posts where user_id in "+
 				"(select $1 UNION (select user2_id from connections where user1_id=$1) "+
 				"UNION (select user1_id from connections where user2_id=$1)) "+
 				"order by created_at desc", id)
@@ -65,7 +67,7 @@ func (db *MyDb) PostPostPicture(postId string, image []byte) error {
 		return err
 	}
 	p := new(Post)
-	err = db.SelectOne(p, "select id, created_at, user_id, body from posts where id=$1", pId)
+	err = db.SelectOne(p, "select id, created_at, user_id, bg_color, body from posts where id=$1", pId)
 	p.Picture = image
 	p.HasPicture = true
 	_, err = db.Update(p)
