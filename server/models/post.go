@@ -28,8 +28,8 @@ func (db *MyDb) NewPost(userId, content, bgcolor string) (*Post, error) {
 		return nil, err
 	}
 	return &Post{
-		UserId: id,
-		Body:   content,
+		UserId:  id,
+		Body:    content,
 		BgColor: bgcolor,
 	}, nil
 }
@@ -54,6 +54,14 @@ func (db *MyDb) GetPost(postId string) (*Post, error) {
 
 func (db *MyDb) DeletePost(postId string) error {
 	p, err := db.GetPost(postId)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("delete from comments where post_id=$1", p.Id)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("delete from stars where post_id=$1", p.Id)
 	if err != nil {
 		return err
 	}
