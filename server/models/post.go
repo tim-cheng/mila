@@ -39,6 +39,31 @@ func (db *MyDb) PostPost(post *Post) error {
 	return err
 }
 
+func (db *MyDb) GetPost(postId string) (*Post, error) {
+	pId, err := db.validatePostId(postId)
+	if err != nil {
+		return nil, err
+	}
+	p := new(Post)
+	err = db.SelectOne(p, "select id, user_id from posts where id=$1", pId)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (db *MyDb) DeletePost(postId string) error {
+	p, err := db.GetPost(postId)
+	if err != nil {
+		return err
+	}
+	count, err := db.Delete(p)
+	if count != 1 {
+		return errors.New("couldn't delete post")
+	}
+	return err
+}
+
 func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 	id, err := db.validateUserId(userId)
 	if err != nil {

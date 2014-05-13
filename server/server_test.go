@@ -144,6 +144,8 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "create post", createPost(e, p, "1", "This is post4"), 201)
 	checkCode(t, "create post", createPost(e, p, "2", "This is post5"), 201)
 	checkCode(t, "create post", createPost(e, p, "2", "This is post6"), 201)
+	checkCode(t, "delete post", testClient(e, p, "DELETE", "/posts/6", ""), 200)
+	// TODO: test delete post permission
 	checkCode(t, "create post auth", createPost(e, "testtest", "1", "This is post2"), 401)
 	checkCode(t, "create post non-existent user", createPost(e, p, "100", "This is post2"), 404)
 

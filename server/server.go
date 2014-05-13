@@ -59,6 +59,7 @@ func startServer() {
 
 	m.Post("/posts", authFunc, router.PostPost)
 	m.Get("/posts", authFunc, router.GetPosts)
+	m.Delete("/posts/:id", authFunc, router.DeletePost)
 
 	m.Post("/posts/:id/comments", authFunc, router.PostComment)
 	m.Get("/posts/:id/comments", authFunc, router.GetComments)

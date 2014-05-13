@@ -25,6 +25,17 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 	}
 }
 
+func (rt *Routes) DeletePost(params martini.Params, r render.Render) {
+	err := rt.Db.DeletePost(params["id"])
+	if err == nil {
+		r.JSON(200, nil)
+	} else {
+		r.JSON(404, map[string]interface{}{
+			"message": "Failed to delete post " + err.Error(),
+		})
+	}
+}
+
 func (rt *Routes) GetPosts(r render.Render, req *http.Request) {
 	posts, err := rt.Db.GetPosts(req.FormValue("user_id"), req.FormValue("degree"))
 	if err == nil && len(posts) > 0 {
