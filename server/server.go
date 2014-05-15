@@ -38,9 +38,7 @@ func startServer() {
 	//m.Use(authFunc)
 
 	// Routes
-	m.Get("/", func() string {
-		return "Welcome to Mila"
-	})
+	m.Use(martini.Static("assets")) 
 
 	m.Get("/login", authFunc, router.Login)
 	m.Get("/login_facebook", router.LoginFacebook)
