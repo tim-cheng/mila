@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"github.com/mostafah/mandrill"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/mostafah/mandrill"
 )
 
 // from https://codereview.appspot.com/76540043/patch/80001/90001
@@ -74,7 +74,6 @@ func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
 		r.JSON(500, nil)
 	}
 	fmt.Printf("auth fb: %v, %v\n", email, password)
-
 
 	user, err := rt.Db.GetUserByEmail(email + "@fb")
 	if user != nil && err == nil {
