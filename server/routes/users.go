@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"github.com/mostafah/mandrill"
 )
 
 // from https://codereview.appspot.com/76540043/patch/80001/90001
@@ -103,6 +104,7 @@ func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
 		}
 		if err == nil {
 			go rt.downloadFacebookPicture(user.Id, req.FormValue("fb_id"))
+			go sendNewUserEmail(email, user.FirstName)
 			r.JSON(201, map[string]interface{}{
 				"id": user.Id,
 			})
@@ -194,12 +196,26 @@ func (rt *Routes) PostUser(r render.Render, req *http.Request) {
 		err = rt.Db.PostUser(user)
 	}
 	if err == nil {
+		go sendNewUserEmail(user.Email, user.FirstName)
 		r.JSON(201, map[string]interface{}{
 			"id": user.Id,
 		})
+
 	} else {
 		r.JSON(404, map[string]interface{}{
 			"message": "Failed to add user " + err.Error(),
 		})
 	}
+}
+
+func sendNewUserEmail(email, first_name string) {
+	mandrill.Key = "izQqlSTrNP4ZKZQ_rtM3-Q"
+	msg := mandrill.NewMessageTo(email, first_name)
+	msg.HTML = "<p>Welcome to Parent2D</p>"
+	msg.Text = "Welcome to Parent2D" // optional
+	msg.Subject = "Welcome to Parent2D"
+	msg.FromEmail = "sherry@parent2d.com"
+	msg.FromName = "Parent2D"
+	res, err := msg.Send(false)
+	fmt.Printf("res = %v, err = %v\n", res, err)
 }
