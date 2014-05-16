@@ -29,12 +29,17 @@ func (u *User) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
-func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id string) (*User, error) {
-
-	// generate hash
+// helper
+func (db *MyDb) genSaltedHash(password string) string {
 	hashQuery := fmt.Sprintf("select crypt('%s', gen_salt('md5'))", password)
 	var hash string
 	db.SelectOne(&hash, hashQuery)
+	return hash
+}
+
+func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id string) (*User, error) {
+
+	hash := db.genSaltedHash(password)
 
 	return &User{
 		Type:        typ,
@@ -69,6 +74,12 @@ func (db *MyDb) GetUserByEmail(email string) (*User, error) {
 
 func (db *MyDb) PostUser(user *User) error {
 	err := db.Insert(user)
+	return err
+}
+
+func (db *MyDb) UpdatePassword(user *User, password string) error {
+	user.Password = db.genSaltedHash(password)
+	_, err := db.Update(user)
 	return err
 }
 

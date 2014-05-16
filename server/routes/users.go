@@ -74,19 +74,26 @@ func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
 	}
 	fmt.Printf("auth fb: %v, %v\n", email, password)
 
-	// TODO: validate password/access_token with FB graph API
 
 	user, err := rt.Db.GetUserByEmail(email + "@fb")
 	if user != nil && err == nil {
-		r.JSON(200, map[string]interface{}{
-			"id": user.Id,
-		})
+		// TODO: validate password/access_token with FB graph API
+		err := rt.Db.UpdatePassword(user, password)
+		if err == nil {
+			r.JSON(200, map[string]interface{}{
+				"id": user.Id,
+			})
+		} else {
+			r.JSON(401, map[string]interface{}{
+				"message": "Not authorized " + err.Error(),
+			})
+		}
 	} else {
 		// need to create the user
 		user, err = rt.Db.NewUser(
 			"facebook",
 			email+"@fb",
-			"fAcEbOoK",
+			password,
 			req.FormValue("first_name"),
 			req.FormValue("last_name"),
 			req.FormValue("fb_id"),
