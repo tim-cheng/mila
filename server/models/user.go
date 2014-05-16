@@ -78,8 +78,8 @@ func (db *MyDb) PostUser(user *User) error {
 }
 
 func (db *MyDb) UpdatePassword(user *User, password string) error {
-	user.Password = db.genSaltedHash(password)
-	_, err := db.Update(user)
+	hash := db.genSaltedHash(password)
+	_, err := db.Exec("update users set password=$1 where id=$2", hash, user.Id)
 	return err
 }
 
