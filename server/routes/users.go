@@ -2,11 +2,13 @@ package routes
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/mostafah/mandrill"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -68,51 +70,82 @@ func (rt *Routes) downloadFacebookPicture(userId int64, fbId string) {
 	}
 }
 
-func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
-	email, password, err := basicAuth(req)
+func getFbIdFromToken(token string) (string, error) {
+	res, err := http.Get("https://graph.facebook.com/me?fields=id&access_token=" + token)
 	if err != nil {
-		r.JSON(500, nil)
+		return "", err
 	}
-	fmt.Printf("auth fb: %v, %v\n", email, password)
+	var msg struct {
+		Id string `json:"id"`
+	}
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&msg)
+	if err != nil && err != io.EOF {
+		return "", err
+	}
+	if msg.Id == "" {
+		return "", errors.New("FB auth failed")
+	}
+	return msg.Id, nil
+}
 
-	user, err := rt.Db.GetUserByEmail(email + "@fb")
-	if user != nil && err == nil {
-		// TODO: validate password/access_token with FB graph API
-		err := rt.Db.UpdatePassword(user, password)
-		if err == nil {
-			r.JSON(200, map[string]interface{}{
-				"id": user.Id,
-			})
+func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
+
+	retStatus := 401
+	// break out for failure if anything failed
+	for {
+		email, password, err := basicAuth(req)
+		if err != nil {
+			break
+		}
+		fmt.Printf("auth fb: %v, %v\n", email, password)
+
+		fbId, err := getFbIdFromToken(password)
+		if err != nil {
+			break
+		}
+
+		user, err := rt.Db.GetUserByEmail(email + "@fb")
+		if user != nil && err == nil {
+			// user exist
+			retStatus = 200
+			if fbId != req.FormValue("fb_id") {
+				break
+			}
+			err = rt.Db.UpdatePassword(user, password)
+			if err != nil {
+				break
+			}
 		} else {
-			r.JSON(401, map[string]interface{}{
-				"message": "Not authorized " + err.Error(),
-			})
-		}
-	} else {
-		// need to create the user
-		user, err = rt.Db.NewUser(
-			"facebook",
-			email+"@fb",
-			password,
-			req.FormValue("first_name"),
-			req.FormValue("last_name"),
-			req.FormValue("fb_id"),
-		)
-		if err == nil {
+			// user doesn't exist
+			retStatus = 201
+			user, err = rt.Db.NewUser(
+				"facebook",
+				email+"@fb",
+				password,
+				req.FormValue("first_name"),
+				req.FormValue("last_name"),
+				req.FormValue("fb_id"),
+			)
+			if err != nil {
+				break
+			}
 			err = rt.Db.PostUser(user)
-		}
-		if err == nil {
+			if err != nil {
+				break
+			}
 			go rt.downloadFacebookPicture(user.Id, req.FormValue("fb_id"))
 			go sendNewUserEmail(email, user.FirstName)
-			r.JSON(201, map[string]interface{}{
-				"id": user.Id,
-			})
-		} else {
-			r.JSON(404, map[string]interface{}{
-				"message": "Failed to add user " + err.Error(),
-			})
 		}
+
+		r.JSON(retStatus, map[string]interface{}{
+			"id": user.Id,
+		})
+		return
 	}
+	r.JSON(retStatus, map[string]interface{}{
+		"message": "Not authorized",
+	})
 }
 
 func (rt *Routes) GetUser(params martini.Params, r render.Render) {
