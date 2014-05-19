@@ -249,8 +249,6 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 		return
 	}
 
-	fmt.Println("search term: ", search)
-
 	words := strings.Split(search, " ")
 	if len(words) > 2 {
 		r.JSON(404, map[string]interface{}{
@@ -258,8 +256,6 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 		})
 		return
 	}
-
-	fmt.Println("here...")
 
 	var res []int64
 	if len(words) == 1 {
@@ -280,10 +276,9 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 	}
 	resMsg := make([]map[string]int64, len(res), len(res))
 	for i, id := range res {
-		resMsg[i] = map[string]int64{"id" : id}
+		resMsg[i] = map[string]int64{"id": id}
 	}
 
-	fmt.Println("return search: ", resMsg)
 	r.JSON(200, resMsg)
 }
 
