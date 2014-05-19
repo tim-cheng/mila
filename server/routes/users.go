@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
-	"github.com/mostafah/mandrill"
 	"github.com/tim-cheng/mila/server/models"
 	"io"
 	"io/ioutil"
@@ -285,16 +284,4 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 	}
 
 	r.JSON(200, resMsg)
-}
-
-func sendNewUserEmail(email, first_name string) {
-	mandrill.Key = "izQqlSTrNP4ZKZQ_rtM3-Q"
-	msg := mandrill.NewMessageTo(email, first_name)
-	msg.HTML = "<p>Welcome to Parent2D</p>"
-	msg.Text = "Welcome to Parent2D" // optional
-	msg.Subject = "Welcome to Parent2D"
-	msg.FromEmail = "sherry@parent2d.com"
-	msg.FromName = "Parent2D"
-	res, err := msg.Send(false)
-	fmt.Printf("res = %v, err = %v\n", res, err)
 }
