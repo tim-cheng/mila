@@ -49,6 +49,8 @@ func startServer() {
 	m.Get("/users/:id/picture", router.GetUserPicture)
 	m.Post("/users", router.PostUser)
 
+	m.Get("/users", authFunc, router.SearchUsers)
+
 	m.Post("/connections", authFunc, router.PostConnection)
 	m.Delete("/connections", authFunc, router.DeleteConnection)
 

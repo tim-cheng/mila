@@ -194,4 +194,16 @@ func TestBasic(t *testing.T) {
 	//checkCode(t, "login with fb", testClient("fb_user@test.com", "random_access_token", "GET", "/login_facebook?first_name=Fb&last_name=User", ""), 201)
 	//checkCode(t, "login again with fb", testClient("fb_user@test.com", "random_access_token", "GET", "/login_facebook?first_name=Fb&last_name=User", ""), 200)
 
+	// search
+	checkCode(t, "search users", testClient(e, p, "GET", "/users", ""), 404)
+	checkCode(t, "search users", testClient(e, p, "GET", "/users?search=blah", ""), 404)
+	checkCode(t, "search users", testClient(e, p, "GET", "/users?search=First3", ""), 200)
+	checkCode(t, "search users", testClient(e, p, "GET", "/users?search=Last3", ""), 200)
+	checkCode(t, "search users", testClient(e, p, "GET", "/users?search=First3%20Last3", ""), 200)
+
+	checkCode(t, "create user", createUser("search1@test.com", "searh1", "First3", "Last3"), 201)
+	checkCode(t, "create user", createUser("search2@test.com", "searh1", "First3", "Last3"), 201)
+	checkCode(t, "create user", createUser("search3@test.com", "searh1", "First3", "Last3"), 201)
+	checkCode(t, "search users", testClient(e, p, "GET", "/users?search=First3", ""), 200)
+
 }

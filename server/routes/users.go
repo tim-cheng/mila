@@ -240,6 +240,53 @@ func (rt *Routes) PostUser(r render.Render, req *http.Request) {
 	}
 }
 
+func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
+	search := req.FormValue("search")
+	if search == "" {
+		r.JSON(404, map[string]interface{}{
+			"message": "search param missing",
+		})
+		return
+	}
+
+	fmt.Println("search term: ", search)
+
+	words := strings.Split(search, " ")
+	if len(words) > 2 {
+		r.JSON(404, map[string]interface{}{
+			"message": "more than 2 words in query",
+		})
+		return
+	}
+
+	fmt.Println("here...")
+
+	var res []int64
+	if len(words) == 1 {
+		// contact results from first name / last name search
+		fRes, _ := rt.Db.GetUserIdByFirstName(words[0])
+		lRes, _ := rt.Db.GetUserIdByLastName(words[0])
+		res = append(fRes, lRes...)
+	} else {
+		// first name last name
+		res, _ = rt.Db.GetUserIdByFullName(words[0], words[1])
+	}
+
+	if len(res) == 0 {
+		r.JSON(404, map[string]interface{}{
+			"message": "no users found",
+		})
+		return
+	}
+	resMsg := make([]map[string]int64, len(res), len(res))
+	for i, id := range res {
+		resMsg[i] = map[string]int64{"id" : id}
+	}
+
+	fmt.Println("return search: ", resMsg)
+	r.JSON(200, resMsg)
+}
+
 func sendNewUserEmail(email, first_name string) {
 	mandrill.Key = "izQqlSTrNP4ZKZQ_rtM3-Q"
 	msg := mandrill.NewMessageTo(email, first_name)
