@@ -103,20 +103,20 @@ func (db *MyDb) GetPassword(email string) (string, error) {
 	return p, err
 }
 
-func (db *MyDb) GetUserIdByFirstName(name string) ([]int64, error) {
-	var ids []int64
-	_, err := db.Select(&ids, "select id from users where first_name=$1", name)
-	return ids, err
+func (db *MyDb) GetUsersByFirstName(name string) ([]User, error) {
+	var users []User
+	_, err := db.Select(&users, "select id, first_name, last_name from users where first_name=$1", name)
+	return users, err
 }
 
-func (db *MyDb) GetUserIdByLastName(name string) ([]int64, error) {
-	var ids []int64
-	_, err := db.Select(&ids, "select id from users where last_name=$1", name)
-	return ids, err
+func (db *MyDb) GetUsersByLastName(name string) ([]User, error) {
+	var users []User
+	_, err := db.Select(&users, "select id, first_name, last_name from users where last_name=$1", name)
+	return users, err
 }
 
-func (db *MyDb) GetUserIdByFullName(firstName, lastName string) ([]int64, error) {
-	var ids []int64
-	_, err := db.Select(&ids, "select id from users where first_name=$1 and last_name=$2", firstName, lastName)
-	return ids, err
+func (db *MyDb) GetUsersByFullName(firstName, lastName string) ([]User, error) {
+	var users []User
+	_, err := db.Select(&users, "select id, first_name, last_name  from users where first_name=$1 and last_name=$2", firstName, lastName)
+	return users, err
 }

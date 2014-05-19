@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/mostafah/mandrill"
+	"github.com/tim-cheng/mila/server/models"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -257,15 +258,15 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 		return
 	}
 
-	var res []int64
+	var res []models.User
 	if len(words) == 1 {
 		// contact results from first name / last name search
-		fRes, _ := rt.Db.GetUserIdByFirstName(words[0])
-		lRes, _ := rt.Db.GetUserIdByLastName(words[0])
+		fRes, _ := rt.Db.GetUsersByFirstName(words[0])
+		lRes, _ := rt.Db.GetUsersByLastName(words[0])
 		res = append(fRes, lRes...)
 	} else {
 		// first name last name
-		res, _ = rt.Db.GetUserIdByFullName(words[0], words[1])
+		res, _ = rt.Db.GetUsersByFullName(words[0], words[1])
 	}
 
 	if len(res) == 0 {
@@ -274,9 +275,13 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 		})
 		return
 	}
-	resMsg := make([]map[string]int64, len(res), len(res))
-	for i, id := range res {
-		resMsg[i] = map[string]int64{"id": id}
+	resMsg := make([]map[string]interface{}, len(res), len(res))
+	for i, u := range res {
+		resMsg[i] = map[string]interface{}{
+			"id":         u.Id,
+			"first_name": u.FirstName,
+			"last_name":  u.LastName,
+		}
 	}
 
 	r.JSON(200, resMsg)
