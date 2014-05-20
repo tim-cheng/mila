@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+func (rt *Routes) GetInvites(params martini.Params, r render.Render) {
+	r.JSON(404, map[string]interface{}{
+		"message": "no invites",
+	})
+}
+
+
 func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 	for {
 		inv, err := rt.Db.NewInvite(params["id"], params["id2"])
@@ -31,6 +38,7 @@ func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 		user2Email := u2.Email
 		user2Email = strings.TrimSuffix(user2Email, "@fb")
 		go sendUserInviteEmail(user2Email, u2.FirstName, u1.FirstName+" "+u1.LastName)
+		go sendUserInvitePush(u2.Id, u1.FirstName+" "+u1.LastName)
 
 		r.JSON(201, map[string]interface{}{
 			"user1_id": inv.User1Id,
