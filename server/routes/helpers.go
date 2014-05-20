@@ -32,8 +32,8 @@ func sendUserInviteEmail(email, firstName, inviterName string) {
 	fmt.Printf("res = %v, err = %v\n", res, err)
 }
 
-func sendUserInvitePush(userId int64, inviterName string) {
-	msg := fmt.Sprintf("{\"channels\":[\"user_%d\"],\"data\":{\"alert\":\"%s requests to connect on Parent2D\"}}", userId, inviterName)
+func sendUserPushMsg(userId int64, pushMsg string) {
+	msg := fmt.Sprintf("{\"channels\":[\"user_%d\"],\"data\":{\"alert\":\"%s\"}}", userId, pushMsg)
 	c := &http.Client{}
 	req, err := http.NewRequest("POST", "https://api.parse.com/1/push", bytes.NewBufferString(msg))
 	if err != nil {

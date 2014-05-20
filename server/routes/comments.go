@@ -17,6 +17,20 @@ func (rt *Routes) PostComment(params martini.Params, r render.Render, req *http.
 		err = rt.Db.PostComment(c)
 	}
 	if err == nil {
+
+		go func() {
+			p, err := rt.Db.GetPost(params["id"])
+			if err == nil {
+				if p.UserId != c.UserId {
+					u, err := rt.Db.GetUser(req.FormValue("user_id"))
+					if err == nil {
+						// send push notification
+						sendUserPushMsg(p.UserId, u.FirstName+" "+u.LastName+" commented on your post")
+					}
+				}
+			}
+		}()
+
 		r.JSON(201, map[string]interface{}{
 			"id": c.Id,
 		})
