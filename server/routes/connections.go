@@ -50,14 +50,15 @@ func (rt *Routes) GetConnections(params martini.Params, r render.Render) {
 		retConns := make([]map[string]interface{}, len(conns))
 		for i := range conns {
 			conn := conns[i].(*models.Connection)
+			id := uId
 			if uId == conn.User1Id {
-				uId = conn.User2Id
+				id = conn.User2Id
 			} else {
-				uId = conn.User1Id
+				id = conn.User1Id
 			}
-			u, _ := rt.Db.GetUserName(uId)
+			u, _ := rt.Db.GetUserName(id)
 			retConns[i] = map[string]interface{}{
-				"user_id":    uId,
+				"user_id":    id,
 				"create_at":  conn.CreatedAt,
 				"first_name": u.FirstName,
 				"last_name":  u.LastName,
