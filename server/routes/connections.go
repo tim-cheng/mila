@@ -52,6 +52,8 @@ func (rt *Routes) GetConnections(params martini.Params, r render.Render) {
 			conn := conns[i].(*models.Connection)
 			if uId == conn.User1Id {
 				uId = conn.User2Id
+			} else {
+				uId = conn.User1Id
 			}
 			u, _ := rt.Db.GetUserName(uId)
 			retConns[i] = map[string]interface{}{

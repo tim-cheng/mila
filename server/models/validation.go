@@ -33,6 +33,19 @@ func (db *MyDb) validatePostId(postId string) (id int64, err error) {
 	return
 }
 
+func (db *MyDb) validateInviteId(user1Id string, user2Id string) (id1 int64, id2 int64, err error) {
+	// validate ids are valid numbers
+	id1, err = db.validateUserId(user1Id)
+	if err != nil {
+		return
+	}
+	id2, err = db.validateUserId(user2Id)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (db *MyDb) validateConnectionId(user1Id string, user2Id string) (id1 int64, id2 int64, err error) {
 
 	// validate ids are valid numbers

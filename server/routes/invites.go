@@ -13,9 +13,9 @@ func (rt *Routes) GetInvites(params martini.Params, r render.Render) {
 		retInvites := make([]map[string]interface{}, len(invites))
 		for i := range invites {
 			inv := invites[i].(*models.Invite)
-			u, _ := rt.Db.GetUserName(inv.User2Id)
+			u, _ := rt.Db.GetUserName(inv.User1Id)
 			retInvites[i] = map[string]interface{}{
-				"user_id":    inv.User2Id,
+				"user_id":    inv.User1Id,
 				"create_at":  inv.CreatedAt,
 				"first_name": u.FirstName,
 				"last_name":  u.LastName,

@@ -18,7 +18,7 @@ func (inv *Invite) PreInsert(s gorp.SqlExecutor) error {
 }
 
 func (db *MyDb) NewInvite(user1Id, user2Id string) (*Invite, error) {
-	id1, id2, err := db.validateConnectionId(user1Id, user2Id)
+	id1, id2, err := db.validateInviteId(user1Id, user2Id)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (db *MyDb) GetInvites(userId string) ([]interface{}, error) {
 }
 
 func (db *MyDb) DeleteInvite(user1Id, user2Id string) error {
-	//  id1, id2, err := db.validateConnectionId(user1Id, user2Id)
+	//  id1, id2, err := db.validateInviteId(user1Id, user2Id)
 	// TODO
 	return nil
 }
