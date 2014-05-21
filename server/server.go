@@ -51,6 +51,7 @@ func startServer() {
 
 	m.Get("/users", authFunc, router.SearchUsers)
 
+	m.Get("/connections/:id", authFunc, router.GetConnections)
 	m.Post("/connections", authFunc, router.PostConnection)
 	m.Delete("/connections", authFunc, router.DeleteConnection)
 

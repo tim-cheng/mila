@@ -1,10 +1,10 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/mostafah/mandrill"
 	"net/http"
-	"bytes"
 	"strconv"
 )
 

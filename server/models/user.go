@@ -63,6 +63,12 @@ func (db *MyDb) GetUser(userId string) (*User, error) {
 	return u, err
 }
 
+func (db *MyDb) GetUserName(uId int64) (*User, error) {
+	u := new(User)
+	err := db.SelectOne(u, "select id, first_name, last_name from users where id=$1", uId)
+	return u, err
+}
+
 func (db *MyDb) GetUserByEmail(email string) (*User, error) {
 	u := new(User)
 	err := db.SelectOne(u, "select id, created_at, email, type, first_name, last_name, num_degree1, num_degree2, description from users where email=$1", email)

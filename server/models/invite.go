@@ -31,6 +31,14 @@ func (db *MyDb) PostInvite(inv *Invite) error {
 	return nil
 }
 
+func (db *MyDb) GetInvites(userId string) ([]interface{}, error) {
+	uId, err := db.validateUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+	return db.Select(Invite{}, "select user1_id, user2_id from invites where user2_id=$1", uId)
+}
+
 func (db *MyDb) DeleteInvite(user1Id, user2Id string) error {
 	//  id1, id2, err := db.validateConnectionId(user1Id, user2Id)
 	// TODO

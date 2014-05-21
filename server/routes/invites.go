@@ -3,15 +3,31 @@ package routes
 import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"github.com/tim-cheng/mila/server/models"
 	"strings"
 )
 
 func (rt *Routes) GetInvites(params martini.Params, r render.Render) {
-	r.JSON(404, map[string]interface{}{
-		"message": "no invites",
-	})
+	invites, err := rt.Db.GetInvites(params["id"])
+	if err == nil && len(invites) > 0 {
+		retInvites := make([]map[string]interface{}, len(invites))
+		for i := range invites {
+			inv := invites[i].(*models.Invite)
+			u, _ := rt.Db.GetUserName(inv.User2Id)
+			retInvites[i] = map[string]interface{}{
+				"user_id":    inv.User2Id,
+				"create_at":  inv.CreatedAt,
+				"first_name": u.FirstName,
+				"last_name":  u.LastName,
+			}
+		}
+		r.JSON(200, retInvites)
+	} else {
+		r.JSON(404, map[string]interface{}{
+			"message": "Failed to get invites ",
+		})
+	}
 }
-
 
 func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 	for {

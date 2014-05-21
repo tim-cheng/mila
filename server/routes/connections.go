@@ -1,8 +1,11 @@
 package routes
 
 import (
+	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
+	"github.com/tim-cheng/mila/server/models"
 	"net/http"
+	"strconv"
 )
 
 func (rt *Routes) PostConnection(r render.Render, req *http.Request) {
@@ -29,6 +32,39 @@ func (rt *Routes) DeleteConnection(r render.Render, req *http.Request) {
 	} else {
 		r.JSON(404, map[string]interface{}{
 			"message": "Failed to delete connection " + err.Error(),
+		})
+	}
+}
+
+func (rt *Routes) GetConnections(params martini.Params, r render.Render) {
+	userId := params["id"]
+	uId, err := strconv.ParseInt(userId, 0, 64)
+	if err != nil {
+		r.JSON(404, map[string]interface{}{
+			"message": "invalid user_id",
+		})
+	}
+
+	conns, err := rt.Db.GetConnections(userId)
+	if err == nil && len(conns) > 0 {
+		retConns := make([]map[string]interface{}, len(conns))
+		for i := range conns {
+			conn := conns[i].(*models.Connection)
+			if uId == conn.User1Id {
+				uId = conn.User2Id
+			}
+			u, _ := rt.Db.GetUserName(uId)
+			retConns[i] = map[string]interface{}{
+				"user_id":    uId,
+				"create_at":  conn.CreatedAt,
+				"first_name": u.FirstName,
+				"last_name":  u.LastName,
+			}
+		}
+		r.JSON(200, retConns)
+	} else {
+		r.JSON(404, map[string]interface{}{
+			"message": "Failed to get connections ",
 		})
 	}
 }

@@ -40,3 +40,11 @@ func (db *MyDb) GetNumConnections(userId int64) (int, error) {
 	count, err := db.SelectInt("select count(*) from connections where (user1_id=$1 or user2_id=$1)", userId)
 	return int(count), err
 }
+
+func (db *MyDb) GetConnections(userId string) ([]interface{}, error) {
+	uId, err := db.validateUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+	return db.Select(Connection{}, "select user1_id, user2_id from connections where user1_id=$1 or user2_id=$1", uId)
+}

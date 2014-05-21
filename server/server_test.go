@@ -206,4 +206,11 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "create user", createUser("search3@test.com", "searh1", "First3", "Last3"), 201)
 	checkCode(t, "search users", testClient(e, p, "GET", "/users?search=First3", ""), 200)
 
+	checkCode(t, "invite user", testClient(e, p, "POST", "/users/1/invite/7", ""), 201)
+	checkCode(t, "invite user", testClient(e, p, "POST", "/users/1/invite/8", ""), 201)
+	checkCode(t, "get invites 200", testClient(e, p, "GET", "/connections/1", ""), 200)
+	checkCode(t, "get invites 404", testClient(e, p, "GET", "/connections/8", ""), 404)
+	checkCode(t, "get connections 200", testClient(e, p, "GET", "/connections/1", ""), 200)
+	checkCode(t, "get connections 404", testClient(e, p, "GET", "/connections/8", ""), 404)
+
 }
