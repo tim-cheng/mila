@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/coopernurse/gorp"
 	"time"
+	"errors"
 )
 
 type Invite struct {
@@ -39,8 +40,10 @@ func (db *MyDb) GetInvites(userId string) ([]interface{}, error) {
 	return db.Select(Invite{}, "select user1_id, user2_id from invites where user2_id=$1", uId)
 }
 
-func (db *MyDb) DeleteInvite(user1Id, user2Id string) error {
-	//  id1, id2, err := db.validateInviteId(user1Id, user2Id)
-	// TODO
-	return nil
+func (db *MyDb) DeleteInvite(inv *Invite) error {
+	count, err := db.Delete(inv)
+	if count != 1 {
+		return errors.New("couldn't delete invite")
+	}
+	return err
 }

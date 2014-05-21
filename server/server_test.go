@@ -213,4 +213,6 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "get connections 200", testClient(e, p, "GET", "/connections/1", ""), 200)
 	checkCode(t, "get connections 404", testClient(e, p, "GET", "/connections/8", ""), 404)
 
+	checkCode(t, "accept invite", testClient(e, p, "DELETE", "/users/1/invite/8", ""), 200)
+	checkCode(t, "new connection established", testClient(e, p, "GET", "/connections/8", ""), 200)
 }

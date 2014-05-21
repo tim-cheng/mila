@@ -29,6 +29,37 @@ func (rt *Routes) GetInvites(params martini.Params, r render.Render) {
 	}
 }
 
+func (rt *Routes) DeleteInvite(params martini.Params, r render.Render) {
+	for {
+		inv, err := rt.Db.NewInvite(params["id"], params["id2"])
+		if err != nil {
+			break
+		}
+		err = rt.Db.DeleteInvite(inv)
+		if err != nil {
+			break
+		}
+
+		conn, err := rt.Db.NewConnection(params["id"], params["id2"])
+		if err != nil {
+			break
+		}
+
+		err = rt.Db.PostConnection(conn)
+		if err != nil {
+			break
+		}
+		r.JSON(200, map[string]interface{}{
+			"message": "connected",
+		})
+		return
+	}
+	r.JSON(404, map[string]interface{}{
+		"message": "failed to accept invite",
+	})
+}
+
+
 func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 	for {
 		inv, err := rt.Db.NewInvite(params["id"], params["id2"])
