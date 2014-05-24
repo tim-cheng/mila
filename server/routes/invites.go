@@ -59,7 +59,6 @@ func (rt *Routes) DeleteInvite(params martini.Params, r render.Render) {
 	})
 }
 
-
 func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 	for {
 		inv, err := rt.Db.NewInvite(params["id"], params["id2"])

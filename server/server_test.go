@@ -3,15 +3,14 @@ package main
 import (
 	"bytes"
 	"fmt"
+	simplejson "github.com/bitly/go-simplejson"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"testing"
 	"time"
-	simplejson "github.com/bitly/go-simplejson"
 )
-
 
 func testClientJsonResp(email, password, method, path, params string) (retStatus int, retResp *simplejson.Json, err error) {
 	retStatus = 0
@@ -246,7 +245,7 @@ func TestBasic(t *testing.T) {
 	checkCode(t, "accept invite", testClient(e, p, "DELETE", "/users/1/invite/8", ""), 200)
 	checkCode(t, "new connection established", testClient(e, p, "GET", "/connections/8", ""), 200)
 
-	checkCode(t, "get activities", testClient(e,p, "GET", "/activities/8", ""), 404)
+	checkCode(t, "get activities", testClient(e, p, "GET", "/activities/8", ""), 404)
 	checkCode(t, "create post", createPost(e, p, "1", "This is new post"), 201)
 	checkCode(t, "create post", createPost(e, p, "8", "This is post8"), 201)
 	checkCode(t, "create comment", createComment(e, p, "1", "9", "This is my comment"), 201)
@@ -255,7 +254,7 @@ func TestBasic(t *testing.T) {
 	// actiivities are not added right away
 	time.Sleep(time.Second * 1)
 
-	code, resp, _ := testClientJsonResp(e,p, "GET", "/activities/8", "")
+	code, resp, _ := testClientJsonResp(e, p, "GET", "/activities/8", "")
 	respAry, _ := resp.Array()
 	fmt.Println("response ", resp)
 	checkCode2(t, "get activities post", code, len(respAry), 200, 3)

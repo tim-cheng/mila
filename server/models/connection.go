@@ -1,9 +1,9 @@
 package models
 
 import (
+	"fmt"
 	"github.com/coopernurse/gorp"
 	"time"
-	"fmt"
 )
 
 type Connection struct {

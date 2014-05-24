@@ -26,7 +26,6 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 			}
 		}()
 
-
 		r.JSON(201, map[string]interface{}{
 			"id": post.Id,
 		})

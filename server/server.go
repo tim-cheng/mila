@@ -74,6 +74,9 @@ func startServer() {
 
 	m.Get("/activities/:id", authFunc, router.GetActivities)
 
+	m.Post("/users/:id/kids", router.PostKid)
+	m.Get("/users/:id/kids", router.GetKids)
+
 	http.ListenAndServe(":8080", m)
 }
 

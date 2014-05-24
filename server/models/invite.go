@@ -1,9 +1,9 @@
 package models
 
 import (
+	"errors"
 	"github.com/coopernurse/gorp"
 	"time"
-	"errors"
 )
 
 type Invite struct {
