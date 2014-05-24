@@ -13,7 +13,7 @@ func (rt *Routes) GetActivities(params martini.Params, r render.Render) {
     for i := range activities {
       a := activities[i].(*models.Activity)
       u, err := rt.Db.GetUserName(a.FriendId)
-      if err != nil {
+      if err == nil {
         typeStr := "";
         switch a.Type {
           case models.ActivityTypePost:

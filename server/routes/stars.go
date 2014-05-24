@@ -19,7 +19,7 @@ func (rt *Routes) PutStar(params martini.Params, r render.Render, req *http.Requ
 			p, err := rt.Db.GetPost(params["id"])
 			if err == nil {
 				if p.UserId != s.UserId {
-					rt.postActivityLike(s.UserId, p.UserId, p.Id)
+					rt.postActivityLike(p.UserId, s.UserId, p.Id)
 				}
 			}
 		}()

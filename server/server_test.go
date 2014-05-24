@@ -2,20 +2,26 @@ package main
 
 import (
 	"bytes"
-	//"fmt"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"testing"
 	"time"
+	simplejson "github.com/bitly/go-simplejson"
 )
 
-func testClient(email, password, method, path, params string) int {
+
+func testClientJsonResp(email, password, method, path, params string) (retStatus int, retResp *simplejson.Json, err error) {
+	retStatus = 0
+	retResp = nil
+	err = nil
+
 	client := &http.Client{}
 	req, err := http.NewRequest(method, "http://localhost:8080"+path, bytes.NewBufferString(params))
 	if err != nil {
-		return 0
+		return
 	}
 	if email != "" {
 		req.SetBasicAuth(email, password)
@@ -26,9 +32,24 @@ func testClient(email, password, method, path, params string) int {
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return 0
+		return
 	}
-	return resp.StatusCode
+	retStatus = resp.StatusCode
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	// ignore json decode error
+	retResp, _ = simplejson.NewJson(buf)
+	return
+}
+
+func testClient(email, password, method, path, params string) int {
+	code, _, err := testClientJsonResp(email, password, method, path, params)
+	if err != nil {
+		code = 0
+	}
+	return code
 }
 
 func testPostImage(email, password, path, filename string) int {
@@ -105,6 +126,15 @@ func checkCode(t *testing.T, msg string, code int, expect int) {
 		t.Log("passed!")
 	} else {
 		t.Errorf("failed: expect %d, got %d\n", expect, code)
+	}
+}
+
+func checkCode2(t *testing.T, msg string, code int, code2 int, expect int, expect2 int) {
+	t.Log("test: " + msg)
+	if code == expect && code2 == expect2 {
+		t.Log("passed!")
+	} else {
+		t.Errorf("failed: expect (%d, %d), got (%d, %d)\n", expect, expect2, code, code2)
 	}
 }
 
@@ -215,4 +245,19 @@ func TestBasic(t *testing.T) {
 
 	checkCode(t, "accept invite", testClient(e, p, "DELETE", "/users/1/invite/8", ""), 200)
 	checkCode(t, "new connection established", testClient(e, p, "GET", "/connections/8", ""), 200)
+
+	checkCode(t, "get activities", testClient(e,p, "GET", "/activities/8", ""), 404)
+	checkCode(t, "create post", createPost(e, p, "1", "This is new post"), 201)
+	checkCode(t, "create post", createPost(e, p, "8", "This is post8"), 201)
+	checkCode(t, "create comment", createComment(e, p, "1", "9", "This is my comment"), 201)
+	checkCode(t, "create star", createStar(e, p, "1", "9"), 200)
+
+	// actiivities are not added right away
+	time.Sleep(time.Second * 1)
+
+	code, resp, _ := testClientJsonResp(e,p, "GET", "/activities/8", "")
+	respAry, _ := resp.Array()
+	fmt.Println("response ", resp)
+	checkCode2(t, "get activities post", code, len(respAry), 200, 3)
+
 }

@@ -21,7 +21,7 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 			friends, err := rt.Db.Get1dConnectionById(post.UserId)
 			if err == nil {
 				for _, id := range friends {
-					rt.postActivityPost(id.(int64), post.UserId, post.Id, post.Body)
+					rt.postActivityPost(id, post.UserId, post.Id, post.Body)
 				}
 			}
 		}()

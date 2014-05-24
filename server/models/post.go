@@ -57,11 +57,16 @@ func (db *MyDb) DeletePost(postId string) error {
 	if err != nil {
 		return err
 	}
+	// TODO: should this be done in the background?
 	_, err = db.Exec("delete from comments where post_id=$1", p.Id)
 	if err != nil {
 		return err
 	}
 	_, err = db.Exec("delete from stars where post_id=$1", p.Id)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("delete from activities where post_id=$1", p.Id)
 	if err != nil {
 		return err
 	}
