@@ -26,6 +26,7 @@ func (rt *Routes) PostComment(params martini.Params, r render.Render, req *http.
 					if err == nil {
 						// send push notification
 						sendUserPushMsg(p.UserId, u.FirstName+" "+u.LastName+" commented on your post")
+						rt.postActivityComment(c.UserId, p.UserId, p.Id, c.Body)
 					}
 				}
 			}

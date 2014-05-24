@@ -15,6 +15,14 @@ func (rt *Routes) PutStar(params martini.Params, r render.Render, req *http.Requ
 		err = rt.Db.PutStar(s)
 	}
 	if err == nil {
+		go func() {
+			p, err := rt.Db.GetPost(params["id"])
+			if err == nil {
+				if p.UserId != s.UserId {
+					rt.postActivityLike(s.UserId, p.UserId, p.Id)
+				}
+			}
+		}()
 		r.JSON(200, nil)
 	} else {
 		r.JSON(404, map[string]interface{}{

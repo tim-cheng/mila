@@ -15,6 +15,18 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 		err = rt.Db.PostPost(post)
 	}
 	if err == nil {
+
+		// add to 1-degree friends activity stream
+		go func() {
+			friends, err := rt.Db.Get1dConnectionById(post.UserId)
+			if err == nil {
+				for _, id := range friends {
+					rt.postActivityPost(id.(int64), post.UserId, post.Id, post.Body)
+				}
+			}
+		}()
+
+
 		r.JSON(201, map[string]interface{}{
 			"id": post.Id,
 		})

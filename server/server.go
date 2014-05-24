@@ -72,6 +72,8 @@ func startServer() {
 	m.Put("/posts/:id/stars", authFunc, router.PutStar)
 	m.Delete("/posts/:id/stars", authFunc, router.DeleteStar)
 
+	m.Get("activities/:id", authFunc, router.GetActivities)
+
 	http.ListenAndServe(":8080", m)
 }
 
