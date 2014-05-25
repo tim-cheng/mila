@@ -84,6 +84,14 @@ func createUser(email, password, firstname, lastname string) int {
 	return testClient("", "", "POST", "/users", params.Encode())
 }
 
+func createKid(pid, name, birthday, boygirl string) int {
+	params := url.Values{}
+	params.Add("name", name)
+	params.Add("birthday", birthday)
+	params.Add("type", boygirl)
+	return testClient("", "", "POST", "/users/"+pid+"/kids", params.Encode())
+}
+
 func createConnection(email, password, id1, id2 string) int {
 	params := url.Values{}
 	params.Add("user1_id", id1)
@@ -259,4 +267,15 @@ func TestBasic(t *testing.T) {
 	fmt.Println("response ", resp)
 	checkCode2(t, "get activities post", code, len(respAry), 200, 3)
 
+	// kids
+	checkCode(t, "add kids", createKid("8", "jane", "2010-03-05", "girl"), 201)
+	checkCode(t, "add kids", createKid("8", "toms", "2002-04-05", "boy"), 201)
+	checkCode(t, "get kids", testClient(e, p, "GET", "/users/8/kids", ""), 200)
+	checkCode(t, "get kids", testClient(e, p, "GET", "/users/7/kids", ""), 404)
+	checkCode(t, "get kids", testClient(e, p, "DELETE", "/users/8/kids/1", ""), 200)
+	checkCode(t, "get kids", testClient(e, p, "DELETE", "/users/8/kids/2", ""), 200)
+	checkCode(t, "get kids", testClient(e, p, "GET", "/users/8/kids", ""), 404)
+
+	checkCode(t, "add kids", createKid("8", "jane", "2010-03-05", "girl"), 201)
+	checkCode(t, "add kids", createKid("8", "toms", "2002-04-05", "boy"), 201)
 }

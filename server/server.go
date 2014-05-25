@@ -76,6 +76,7 @@ func startServer() {
 
 	m.Post("/users/:id/kids", router.PostKid)
 	m.Get("/users/:id/kids", router.GetKids)
+	m.Delete("/users/:id/kids/:kid", router.DeleteKid)
 
 	http.ListenAndServe(":8080", m)
 }

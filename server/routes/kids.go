@@ -4,6 +4,7 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -50,6 +51,28 @@ func (rt *Routes) GetKids(params martini.Params, r render.Render) {
 			"message": "Failed to get kids ",
 		})
 	}
+}
+
+func (rt *Routes) DeleteKid(params martini.Params, r render.Render) {
+	for {
+		kid, err := rt.Db.GetKid(params["kid"])
+		if err != nil {
+			break
+		}
+		pId, err := strconv.Atoi(params["id"])
+		if err != nil || kid.ParentId != int64(pId) {
+			break
+		}
+		err = rt.Db.DeleteKid(kid)
+		if err != nil {
+			break
+		}
+		r.JSON(200, nil)
+		return
+	}
+	r.JSON(404, map[string]interface{}{
+		"message": "Failed to delete kid",
+	})
 }
 
 func birthdayToAge(birthday time.Time) int {
