@@ -40,6 +40,7 @@ func (rt *Routes) GetKids(params martini.Params, r render.Render) {
 		retKids := make([]map[string]interface{}, len(kids))
 		for i := range kids {
 			retKids[i] = map[string]interface{}{
+        "id" : kids[i].Id,
 				"name": kids[i].Name,
 				"age":  birthdayToAge(kids[i].Birthday),
 				"boy":  kids[i].IsBoy,
