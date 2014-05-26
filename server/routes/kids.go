@@ -24,6 +24,7 @@ func (rt *Routes) PostKid(params martini.Params, r render.Render, req *http.Requ
 	}
 
 	if err == nil {
+		go rt.UpdateUserDesc(params["id"])
 		r.JSON(201, map[string]interface{}{
 			"id": kid.Id,
 		})
@@ -40,7 +41,7 @@ func (rt *Routes) GetKids(params martini.Params, r render.Render) {
 		retKids := make([]map[string]interface{}, len(kids))
 		for i := range kids {
 			retKids[i] = map[string]interface{}{
-        "id" : kids[i].Id,
+				"id":   kids[i].Id,
 				"name": kids[i].Name,
 				"age":  birthdayToAge(kids[i].Birthday),
 				"boy":  kids[i].IsBoy,
@@ -68,6 +69,7 @@ func (rt *Routes) DeleteKid(params martini.Params, r render.Render) {
 		if err != nil {
 			break
 		}
+		go rt.UpdateUserDesc(params["id"])
 		r.JSON(200, nil)
 		return
 	}

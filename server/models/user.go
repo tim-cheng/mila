@@ -78,6 +78,11 @@ func (db *MyDb) GetUserByEmail(email string) (*User, error) {
 	return u, err
 }
 
+func (db *MyDb) UpdateUserDesc(userId, desc string) error {
+	_, err := db.Exec("update users set description=$2 where id=$1", userId, desc)
+	return err
+}
+
 func (db *MyDb) PostUser(user *User) error {
 	err := db.Insert(user)
 	return err

@@ -240,6 +240,26 @@ func (rt *Routes) PostUser(r render.Render, req *http.Request) {
 	}
 }
 
+func (rt *Routes) UpdateUserDesc(userId string) {
+	desc := ""
+	kids, err := rt.Db.GetKids(userId)
+	if err == nil && len(kids) > 0 {
+		for i := range kids {
+			desc += strconv.Itoa(birthdayToAge(kids[i].Birthday)) + "yo "
+			if kids[i].IsBoy {
+				desc += "boy"
+			} else {
+				desc += "girl"
+			}
+			if i != (len(kids) - 1) {
+				desc += ", "
+			}
+		}
+		fmt.Println("description: ", desc)
+		rt.Db.UpdateUserDesc(userId, desc)
+	}
+}
+
 func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 	search := req.FormValue("search")
 	if search == "" {
