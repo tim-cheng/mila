@@ -109,3 +109,24 @@ func (db *MyDb) Get1dConnectionById(userId int64) ([]int64, error) {
 	fmt.Println("Get1dConnectionById ", userIds, err)
 	return userIds, err
 }
+
+func (db *MyDb) Get2dConnectionMapById(userId int64) (map[int64]int64, error) {
+	retMap := make(map[int64]int64)
+	ids, err := db.Get1dConnectionById(userId)
+	if err == nil {
+		for _, id := range ids {
+			id2s, err := db.Get1dConnectionById(id)
+			if err == nil {
+				for _, v := range id2s {
+					retMap[v] = id
+				}
+			}
+		}
+		// delete self and 1-d connections
+		delete(retMap, userId)
+		for _, id := range ids {
+			delete(retMap, id)
+		}
+	}
+	return retMap, err
+}

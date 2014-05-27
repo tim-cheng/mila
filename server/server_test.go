@@ -278,4 +278,15 @@ func TestBasic(t *testing.T) {
 
 	checkCode(t, "add kids", createKid("8", "jane", "2010-03-05", "girl"), 201)
 	checkCode(t, "add kids", createKid("8", "toms", "2002-04-05", "boy"), 201)
+
+	checkCode(t, "get posts", testClient(e, p, "GET", "/posts?user_id=1&degree=1", ""), 200)
+	checkCode(t, "get posts", testClient(e, p, "GET", "/posts?user_id=1&degree=2", ""), 200)
+	checkCode(t, "get posts", testClient(e, p, "GET", "/posts?user_id=8&degree=2", ""), 200)
+	checkCode(t, "create post", createPost(e, p, "2", "This is another post"), 201)
+
+	// feeds are not added right away
+	time.Sleep(time.Second * 1)
+	checkCode(t, "get posts", testClient(e, p, "GET", "/posts?user_id=8&degree=2", ""), 200)
+
+
 }

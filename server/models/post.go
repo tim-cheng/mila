@@ -70,6 +70,10 @@ func (db *MyDb) DeletePost(postId string) error {
 	if err != nil {
 		return err
 	}
+	_, err = db.Exec("delete from feeds where post_id=$1", p.Id)
+	if err != nil {
+		return err
+	}
 	count, err := db.Delete(p)
 	if count != 1 {
 		return errors.New("couldn't delete post")
@@ -92,8 +96,11 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 				"(select $1 UNION (select user2_id from connections where user1_id=$1) "+
 				"UNION (select user1_id from connections where user2_id=$1)) "+
 				"order by created_at desc", id)
-	} else {
-		return nil, errors.New("unsupported degree")
+	} else if degree == "2" {
+		posts, err = db.Select(Post{},
+			"select posts.id, posts.created_at, posts.user_id, posts.body, posts.bg_color, posts.has_picture from posts "+
+			"join feeds on posts.id = feeds.post_id " +
+			"where feeds.user_id=$1", id)
 	}
 
 	return posts, err

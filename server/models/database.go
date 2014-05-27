@@ -23,6 +23,7 @@ func NewDb() *MyDb {
 	dbmap.AddTableWithName(Invite{}, "invites").SetKeys(false, "user1_id", "user2_id")
 	dbmap.AddTableWithName(Activity{}, "activities").SetKeys(true, "Id")
 	dbmap.AddTableWithName(Kid{}, "kids").SetKeys(true, "Id")
+	dbmap.AddTableWithName(Feed{}, "feeds").SetKeys(false, "user_id", "post_id")
 	return dbmap
 }
 

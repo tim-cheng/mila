@@ -16,15 +16,36 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 	}
 	if err == nil {
 
-		// add to 1-degree friends activity stream
+		// first add to own feed, to make sure it's always visible immediately
+		feed, err := rt.Db.New1dFeed(post.UserId, post.Id)
+		if err == nil {
+			rt.Db.PostFeed(feed)
+		}
+
+		// add to friends activity stream and feeds in background
 		go func() {
 			friends, err := rt.Db.Get1dConnectionById(post.UserId)
 			if err == nil {
 				for _, id := range friends {
+					feed, err := rt.Db.New1dFeed(id, post.Id)
+					if err == nil {
+						rt.Db.PostFeed(feed)
+					}
 					rt.postActivityPost(id, post.UserId, post.Id, post.Body)
 				}
 			}
+
+			conn2d, err := rt.Db.Get2dConnectionMapById(post.UserId)
+			if err == nil {
+				for k, v := range conn2d {
+					feed, err := rt.Db.New2dFeed(k, post.Id, v)
+					if err == nil {
+						rt.Db.PostFeed(feed)
+					}
+				}
+			}
 		}()
+
 
 		r.JSON(201, map[string]interface{}{
 			"id": post.Id,
