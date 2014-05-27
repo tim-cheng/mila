@@ -83,6 +83,16 @@ func (db *MyDb) UpdateUserDesc(userId, desc string) error {
 	return err
 }
 
+func (db *MyDb) Update1dConnection(userId int64, nConn int) error {
+	_, err := db.Exec("update users set num_degree1=$2 where id=$1", userId, nConn)
+	return err
+}
+
+func (db *MyDb) Update2dConnection(userId int64, nConn int) error {
+	_, err := db.Exec("update users set num_degree2=$2 where id=$1", userId, nConn)
+	return err
+}
+
 func (db *MyDb) PostUser(user *User) error {
 	err := db.Insert(user)
 	return err
