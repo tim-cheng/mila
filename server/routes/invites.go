@@ -4,7 +4,9 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/tim-cheng/mila/server/models"
+	"net/http"
 	"strings"
+	"fmt"
 )
 
 func (rt *Routes) GetInvites(params martini.Params, r render.Render) {
@@ -96,5 +98,37 @@ func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 
 	r.JSON(404, map[string]interface{}{
 		"message": "Failed to add invite",
+	})
+}
+
+func (rt *Routes) PostFbInvite(params martini.Params, r render.Render, req *http.Request) {
+
+	for {
+		user, err := rt.Db.GetUser(params["id"])
+		if err != nil {
+			break
+		}
+		usernames := strings.Split(req.FormValue("usernames"), "|")
+		if len(usernames) == 0 {
+			break
+		}
+
+		for _, u := range usernames {
+			v := strings.Split(u, "@")
+			if len(v) != 2 {
+				break
+			}
+			fmt.Println("send email: ", v[1]+"@facebook.com", v[0], user.FirstName+" "+user.LastName)
+			go sendUserInviteEmail(v[1]+"@facebook.com", v[0], user.FirstName+" "+user.LastName)
+		}
+
+		return
+		r.JSON(200, map[string]interface{}{
+			"message": "fb invite sent",
+		})
+	}
+
+	r.JSON(404, map[string]interface{}{
+		"message": "Failed to send FB invite",
 	})
 }

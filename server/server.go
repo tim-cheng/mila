@@ -59,6 +59,8 @@ func startServer() {
 	m.Post("/users/:id/invite/:id2", authFunc, router.PostInvite)
 	m.Delete("/users/:id/invite/:id2", authFunc, router.DeleteInvite)
 
+	m.Post("/users/:id/fb_invite", authFunc, router.PostFbInvite)
+
 	m.Post("/posts/:id/picture", authFunc, router.PostPostPicture)
 	m.Get("/posts/:id/picture", authFunc, router.GetPostPicture)
 
