@@ -73,7 +73,7 @@ func (rt *Routes) GetPosts(r render.Render, req *http.Request) {
 	if err == nil && len(posts) > 0 {
 		retPosts := make([]map[string]interface{}, len(posts))
 		for i := range posts {
-			p := posts[i].(*models.Post)
+			p := posts[i].(*models.PostFeed)
 			nComments, _ := rt.Db.GetNumComments(p.Id)
 			nStars, _ := rt.Db.GetNumStars(p.Id)
 			nSelfStar, _ := rt.Db.GetStarByUser(p.Id, req.FormValue("user_id"))
@@ -87,6 +87,7 @@ func (rt *Routes) GetPosts(r render.Render, req *http.Request) {
 				"num_stars":    nStars,
 				"self_star":    nSelfStar,
 				"has_picture":  p.HasPicture,
+				"ref_user_id" : p.RefUserId,
 			}
 		}
 		r.JSON(200, retPosts)

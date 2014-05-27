@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/coopernurse/gorp"
 	"time"
+	"fmt"
 )
 
 type Post struct {
@@ -14,6 +15,17 @@ type Post struct {
 	BgColor    string    `db:"bg_color"`
 	Picture    []byte    `db:"picture"`
 	HasPicture bool      `db:"has_picture"`
+}
+
+type PostFeed struct {
+	Id         int64     `db:"id"`
+	CreatedAt  time.Time `db:"created_at"`
+	UserId     int64     `db:"user_id"`
+	Body       string    `db:"body"`
+	BgColor    string    `db:"bg_color"`
+	Picture    []byte    `db:"picture"`
+	HasPicture bool      `db:"has_picture"`
+	RefUserId  int64     `db:"ref_user_id"`
 }
 
 // Validation Hooks
@@ -89,16 +101,18 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 
 	var posts []interface{}
 	if degree == "" || degree == "0" {
-		posts, err = db.Select(Post{}, "select id, created_at, user_id, body, bg_color, has_picture from posts where user_id=$1", id)
+		posts, err = db.Select(PostFeed{}, "select id Id, created_at CreatedAt, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id=$1", id)
+		fmt.Println("!!!!!! errorrr ", posts, err)
 	} else if degree == "1" {
-		posts, err = db.Select(Post{},
-			"select id, created_at, user_id, body, bg_color, has_picture from posts where user_id in "+
+		posts, err = db.Select(PostFeed{},
+			"select id Id, created_at CreatedAt, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id in "+
 				"(select $1 UNION (select user2_id from connections where user1_id=$1) "+
 				"UNION (select user1_id from connections where user2_id=$1)) "+
 				"order by created_at desc", id)
+		fmt.Println("!!!!!! errorrr ", posts, err)
 	} else if degree == "2" {
-		posts, err = db.Select(Post{},
-			"select posts.id, posts.created_at, posts.user_id, posts.body, posts.bg_color, posts.has_picture from posts "+
+		posts, err = db.Select(PostFeed{},
+			"select posts.id Id, posts.created_at CreatedAt, posts.user_id UserId, posts.body Body, posts.bg_color BgColor, posts.has_picture HasPicture, feeds.ref_user_id RefUserId from posts "+
 			"join feeds on posts.id = feeds.post_id " +
 			"where feeds.user_id=$1", id)
 	}
