@@ -46,7 +46,6 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 			}
 		}()
 
-
 		r.JSON(201, map[string]interface{}{
 			"id": post.Id,
 		})
@@ -87,7 +86,7 @@ func (rt *Routes) GetPosts(r render.Render, req *http.Request) {
 				"num_stars":    nStars,
 				"self_star":    nSelfStar,
 				"has_picture":  p.HasPicture,
-				"ref_user_id" : p.RefUserId,
+				"ref_user_id":  p.RefUserId,
 			}
 		}
 		r.JSON(200, retPosts)

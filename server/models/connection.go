@@ -75,7 +75,6 @@ func (db *MyDb) updateConnections(user1Id, user2Id int64) {
 	}
 }
 
-
 func (db *MyDb) PostConnection(conn *Connection) error {
 	err := db.Insert(conn)
 	if err == nil {

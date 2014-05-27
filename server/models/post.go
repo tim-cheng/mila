@@ -2,9 +2,9 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"github.com/coopernurse/gorp"
 	"time"
-	"fmt"
 )
 
 type Post struct {
@@ -113,8 +113,8 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 	} else if degree == "2" {
 		posts, err = db.Select(PostFeed{},
 			"select posts.id Id, posts.created_at CreatedAt, posts.user_id UserId, posts.body Body, posts.bg_color BgColor, posts.has_picture HasPicture, feeds.ref_user_id RefUserId from posts "+
-			"join feeds on posts.id = feeds.post_id " +
-			"where feeds.user_id=$1", id)
+				"join feeds on posts.id = feeds.post_id "+
+				"where feeds.user_id=$1", id)
 	}
 
 	return posts, err

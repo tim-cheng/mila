@@ -288,5 +288,4 @@ func TestBasic(t *testing.T) {
 	time.Sleep(time.Second * 1)
 	checkCode(t, "get posts", testClient(e, p, "GET", "/posts?user_id=8&degree=2", ""), 200)
 
-
 }
