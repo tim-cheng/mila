@@ -9,12 +9,13 @@ import (
 
 type MyDb struct {
 	gorp.DbMap
+	sqlDb *sql.DB
 }
 
 func NewDb() *MyDb {
 	db, err := sql.Open("postgres", "user=postgres password=postgres dbname=mila_dev sslmode=disable")
 	checkErr(err, "sql.Open failed")
-	dbmap := &MyDb{gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}}
+	dbmap := &MyDb{gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}, db}
 	dbmap.AddTableWithName(User{}, "users").SetKeys(true, "Id")
 	dbmap.AddTableWithName(Connection{}, "connections").SetKeys(false, "user1_id", "user2_id")
 	dbmap.AddTableWithName(Post{}, "posts").SetKeys(true, "Id")
