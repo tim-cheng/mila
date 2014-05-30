@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"fmt"
+	//"fmt"
 	"github.com/coopernurse/gorp"
 	"time"
 )
@@ -101,18 +101,19 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 
 	var posts []interface{}
 	if degree == "" || degree == "0" {
-		posts, err = db.Select(PostFeed{}, "select id Id, created_at CreatedAt, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id=$1", id)
-		fmt.Println("!!!!!! errorrr ", posts, err)
+		//posts, err = db.Select(PostFeed{}, "select id Id, created_at CreatedAt, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id=$1", id)
+		posts, err = db.Select(PostFeed{}, "select id, created_at, user_id, body, bg_color, has_picture from posts where user_id=$1", id)
 	} else if degree == "1" {
 		posts, err = db.Select(PostFeed{},
-			"select id Id, created_at CreatedAt, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id in "+
+			//"select id Id, created_at CreatedAt, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id in "+
+			"select id, created_at, user_id UserId, body Body, bg_color BgColor, has_picture HasPicture from posts where user_id in "+
 				"(select $1 UNION (select user2_id from connections where user1_id=$1) "+
 				"UNION (select user1_id from connections where user2_id=$1)) "+
 				"order by created_at desc", id)
-		fmt.Println("!!!!!! errorrr ", posts, err)
 	} else if degree == "2" {
 		posts, err = db.Select(PostFeed{},
-			"select posts.id Id, posts.created_at CreatedAt, posts.user_id UserId, posts.body Body, posts.bg_color BgColor, posts.has_picture HasPicture, feeds.ref_user_id RefUserId from posts "+
+			//"select posts.id Id, posts.created_at CreatedAt, posts.user_id UserId, posts.body Body, posts.bg_color BgColor, posts.has_picture HasPicture, feeds.ref_user_id RefUserId from posts "+
+			"select posts.id, posts.created_at, posts.user_id, posts.body, posts.bg_color, posts.has_picture, feeds.ref_user_id from posts "+
 				"join feeds on posts.id = feeds.post_id "+
 				"where feeds.user_id=$1 order by created_at desc", id)
 	}
