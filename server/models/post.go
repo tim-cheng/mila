@@ -114,7 +114,7 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 		posts, err = db.Select(PostFeed{},
 			"select posts.id Id, posts.created_at CreatedAt, posts.user_id UserId, posts.body Body, posts.bg_color BgColor, posts.has_picture HasPicture, feeds.ref_user_id RefUserId from posts "+
 				"join feeds on posts.id = feeds.post_id "+
-				"where feeds.user_id=$1", id)
+				"where feeds.user_id=$1 order by created_at desc", id)
 	}
 
 	return posts, err
