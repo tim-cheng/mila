@@ -39,7 +39,7 @@ func (db *MyDb) genSaltedHash(password string) string {
 	return hash
 }
 
-func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id string) (*User, error) {
+func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id, location, zip string) (*User, error) {
 
 	hash := db.genSaltedHash(password)
 
@@ -52,6 +52,8 @@ func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id string)
 		LastName:    lastName,
 		Description: "proud parent",
 		FbId:        fb_id,
+		Location:    location,
+		Zip:         zip,
 	}, nil
 }
 

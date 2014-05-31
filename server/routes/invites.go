@@ -1,12 +1,12 @@
 package routes
 
 import (
+	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/tim-cheng/mila/server/models"
 	"net/http"
 	"strings"
-	"fmt"
 )
 
 func (rt *Routes) GetInvites(params martini.Params, r render.Render) {
@@ -73,12 +73,12 @@ func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 			break
 		}
 
-		u1, err := rt.Db.GetUser(params["id"])
+		u1, err := rt.Db.GetUserName(params["id"])
 		if err != nil {
 			break
 		}
 
-		u2, err := rt.Db.GetUser(params["id2"])
+		u2, err := rt.Db.GetUserName(params["id2"])
 		if err != nil {
 			break
 		}
@@ -104,7 +104,7 @@ func (rt *Routes) PostInvite(params martini.Params, r render.Render) {
 func (rt *Routes) PostFbInvite(params martini.Params, r render.Render, req *http.Request) {
 
 	for {
-		user, err := rt.Db.GetUser(params["id"])
+		user, err := rt.Db.GetUserName(params["id"])
 		if err != nil {
 			break
 		}

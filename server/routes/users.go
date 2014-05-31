@@ -126,6 +126,8 @@ func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
 				req.FormValue("first_name"),
 				req.FormValue("last_name"),
 				req.FormValue("fb_id"),
+				req.FormValue("location"),
+				req.FormValue("zip"),
 			)
 			if err != nil {
 				break
@@ -160,9 +162,9 @@ func (rt *Routes) GetUser(params martini.Params, r render.Render) {
 			"description": user.Description,
 			"num_degree1": nConn,
 			"num_degree2": user.NumDegree2,
-			"location": user.Location,
-			"zip": user.Zip,
-			"interests": user.Interests,
+			"location":    user.Location,
+			"zip":         user.Zip,
+			"interests":   user.Interests,
 		})
 	} else {
 		r.JSON(404, map[string]interface{}{
@@ -272,6 +274,8 @@ func (rt *Routes) PostUser(r render.Render, req *http.Request) {
 		req.FormValue("first_name"),
 		req.FormValue("last_name"),
 		"",
+		req.FormValue("location"),
+		req.FormValue("zip"),
 	)
 
 	if err == nil {
