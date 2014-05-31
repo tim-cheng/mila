@@ -48,7 +48,7 @@ func (rt *Routes) Login(req *http.Request, r render.Render) {
 	if err != nil {
 		r.JSON(500, nil)
 	}
-	user, err := rt.Db.GetUserByEmail(email)
+	user, err := rt.Db.GetUserNameByEmail(email)
 	if user != nil {
 		r.JSON(200, map[string]interface{}{
 			"id": user.Id,
@@ -105,7 +105,7 @@ func (rt *Routes) LoginFacebook(r render.Render, req *http.Request) {
 			break
 		}
 
-		user, err := rt.Db.GetUserByEmail(email + "@fb")
+		user, err := rt.Db.GetUserNameByEmail(email + "@fb")
 		if user != nil && err == nil {
 			// user exist
 			retStatus = 200
@@ -160,6 +160,9 @@ func (rt *Routes) GetUser(params martini.Params, r render.Render) {
 			"description": user.Description,
 			"num_degree1": nConn,
 			"num_degree2": user.NumDegree2,
+			"location": user.Location,
+			"zip": user.Zip,
+			"interests": user.Interests,
 		})
 	} else {
 		r.JSON(404, map[string]interface{}{
@@ -169,7 +172,7 @@ func (rt *Routes) GetUser(params martini.Params, r render.Render) {
 }
 
 func (rt *Routes) PutUser(params martini.Params, req *http.Request, r render.Render) {
-	user, err := rt.Db.GetUser(params["id"])
+	user, err := rt.Db.GetUserName(params["id"])
 	for {
 		if err != nil {
 			break
@@ -216,7 +219,7 @@ func (rt *Routes) PutUser(params martini.Params, req *http.Request, r render.Ren
 }
 
 func (rt *Routes) PostUserPicture(params martini.Params, r render.Render, req *http.Request) {
-	user, err := rt.Db.GetUser(params["id"])
+	user, err := rt.Db.GetUserName(params["id"])
 	if err != nil {
 		r.JSON(404, map[string]interface{}{
 			"message": "User not found " + err.Error(),
@@ -242,7 +245,7 @@ func (rt *Routes) PostUserPicture(params martini.Params, r render.Render, req *h
 }
 
 func (rt *Routes) GetUserPicture(params martini.Params, r render.Render, w http.ResponseWriter) {
-	user, err := rt.Db.GetUser(params["id"])
+	user, err := rt.Db.GetUserName(params["id"])
 	if err != nil {
 		r.JSON(404, map[string]interface{}{
 			"message": "User not found " + err.Error(),

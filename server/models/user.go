@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"github.com/coopernurse/gorp"
-	"strconv"
 	"time"
 )
 
@@ -56,29 +55,22 @@ func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id string)
 	}, nil
 }
 
-func (db *MyDb) GetUser(userId string) (*User, error) {
-	id, err := strconv.Atoi(userId)
-	if err != nil {
-		return nil, err
-	}
-	u := new(User)
-	err = db.SelectOne(u, "select id, created_at, email, type, first_name, last_name, num_degree1, num_degree2, description from users where id=$1", id)
-	return u, err
+func (db *MyDb) GetUser(id interface{}) (*User, error) {
+	var user User
+	err := db.SelectOne(&user, "select id, created_at, email, type, first_name, last_name, num_degree1, num_degree2, description, location, zip, interests from users where id=$1", id)
+	return &user, err
 }
 
-func (db *MyDb) GetUserName(uId int64) (*User, error) {
-	u := new(User)
-	err := db.SelectOne(u, "select id, first_name, last_name from users where id=$1", uId)
-	return u, err
+func (db *MyDb) GetUserName(id interface{}) (*User, error) {
+	var user User
+	err := db.SelectOne(&user, "select id, first_name, last_name from users where id=$1", id)
+	return &user, err
 }
 
-func (db *MyDb) GetUserByEmail(email string) (*User, error) {
-	u := new(User)
-	err := db.SelectOne(u, "select id, created_at, email, type, first_name, last_name, num_degree1, num_degree2, description from users where email=$1", email)
-	if err != nil {
-		return nil, err
-	}
-	return u, err
+func (db *MyDb) GetUserNameByEmail(email string) (*User, error) {
+	var user User
+	err := db.SelectOne(&user, "select id, first_name, last_name from users where email=$1", email)
+	return &user, err
 }
 
 func (db *MyDb) UpdateUserDesc(userId, desc string) error {

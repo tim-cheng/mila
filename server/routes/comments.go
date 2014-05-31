@@ -22,7 +22,7 @@ func (rt *Routes) PostComment(params martini.Params, r render.Render, req *http.
 			p, err := rt.Db.GetPost(params["id"])
 			if err == nil {
 				if p.UserId != c.UserId {
-					u, err := rt.Db.GetUser(req.FormValue("user_id"))
+					u, err := rt.Db.GetUserName(req.FormValue("user_id"))
 					if err == nil {
 						// send push notification
 						sendUserPushMsg(p.UserId, u.FirstName+" "+u.LastName+" commented on your post")
