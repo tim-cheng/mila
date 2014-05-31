@@ -168,6 +168,36 @@ func (rt *Routes) GetUser(params martini.Params, r render.Render) {
 	}
 }
 
+
+func (rt *Routes) PutUser(params martini.Params, req *http.Request, r render.Render) {
+	user, err := rt.Db.GetUser(params["id"])
+	for {
+		if err != nil {
+			break
+		}
+		if name := req.FormValue("first_name"); name != "" {
+			err = rt.Db.UpdateFirstName(user.Id, name)
+			if err != nil {
+				break
+			}
+		}
+		if name := req.FormValue("last_name"); name != "" {
+			err = rt.Db.UpdateFirstName(user.Id, name)
+			if err != nil {
+				break
+			}
+		}
+		r.JSON(200, map[string]interface{}{
+			"message": "User info updated",
+		})
+		return
+	}
+
+	r.JSON(404, map[string]interface{}{
+		"message": "User info update failed " + err.Error(),
+	})
+}
+
 func (rt *Routes) PostUserPicture(params martini.Params, r render.Render, req *http.Request) {
 	user, err := rt.Db.GetUser(params["id"])
 	if err != nil {
@@ -302,6 +332,7 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 			"last_name":  u.LastName,
 		}
 	}
+
 
 	r.JSON(200, resMsg)
 }

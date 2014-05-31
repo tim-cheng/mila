@@ -88,6 +88,16 @@ func (db *MyDb) Update1dConnection(userId int64, nConn int) error {
 	return err
 }
 
+func (db *MyDb) UpdateFirstName(userId int64, name string) error {
+	_, err := db.Exec("update users set first_name=$2 where id=$1", userId, name)
+	return err
+}
+
+func (db *MyDb) UpdateLastName(userId int64, name string) error {
+	_, err := db.Exec("update users set last_name=$2 where id=$1", userId, name)
+	return err
+}
+
 func (db *MyDb) Update2dConnection(userId int64, nConn int) error {
 	_, err := db.Exec("update users set num_degree2=$2 where id=$1", userId, nConn)
 	return err

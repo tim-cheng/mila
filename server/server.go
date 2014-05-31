@@ -44,6 +44,7 @@ func startServer() {
 	m.Get("/login_facebook", router.LoginFacebook)
 
 	m.Get("/users/:id", authFunc, router.GetUser)
+	m.Put("/users/:id", authFunc, router.PutUser)
 	m.Post("/users/:id/picture", authFunc, router.PostUserPicture)
 	// TODO: get image doesn't require basic auth to make it easier to fetch/cache
 	m.Get("/users/:id/picture", router.GetUserPicture)
