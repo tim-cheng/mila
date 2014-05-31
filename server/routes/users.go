@@ -168,7 +168,6 @@ func (rt *Routes) GetUser(params martini.Params, r render.Render) {
 	}
 }
 
-
 func (rt *Routes) PutUser(params martini.Params, req *http.Request, r render.Render) {
 	user, err := rt.Db.GetUser(params["id"])
 	for {
@@ -183,6 +182,24 @@ func (rt *Routes) PutUser(params martini.Params, req *http.Request, r render.Ren
 		}
 		if name := req.FormValue("last_name"); name != "" {
 			err = rt.Db.UpdateFirstName(user.Id, name)
+			if err != nil {
+				break
+			}
+		}
+		if val := req.FormValue("zip"); val != "" {
+			err = rt.Db.UpdateZip(user.Id, val)
+			if err != nil {
+				break
+			}
+		}
+		if val := req.FormValue("interests"); val != "" {
+			err = rt.Db.UpdateInterests(user.Id, val)
+			if err != nil {
+				break
+			}
+		}
+		if val := req.FormValue("location"); val != "" {
+			err = rt.Db.UpdateLocation(user.Id, val)
 			if err != nil {
 				break
 			}
@@ -332,7 +349,6 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 			"last_name":  u.LastName,
 		}
 	}
-
 
 	r.JSON(200, resMsg)
 }

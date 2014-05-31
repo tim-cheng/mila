@@ -21,6 +21,9 @@ type User struct {
 	NumDegree2  int64     `db:"num_degree2"`
 	Description string    `db:"description"`
 	Picture     []byte    `db:"picture"`
+	Location    string    `db:"location"`
+	Zip         string    `db:"zip"`
+	Interests   string    `db:"interests"`
 }
 
 // Validation Hooks
@@ -88,6 +91,11 @@ func (db *MyDb) Update1dConnection(userId int64, nConn int) error {
 	return err
 }
 
+func (db *MyDb) Update2dConnection(userId int64, nConn int) error {
+	_, err := db.Exec("update users set num_degree2=$2 where id=$1", userId, nConn)
+	return err
+}
+
 func (db *MyDb) UpdateFirstName(userId int64, name string) error {
 	_, err := db.Exec("update users set first_name=$2 where id=$1", userId, name)
 	return err
@@ -98,8 +106,18 @@ func (db *MyDb) UpdateLastName(userId int64, name string) error {
 	return err
 }
 
-func (db *MyDb) Update2dConnection(userId int64, nConn int) error {
-	_, err := db.Exec("update users set num_degree2=$2 where id=$1", userId, nConn)
+func (db *MyDb) UpdateInterests(userId int64, val string) error {
+	_, err := db.Exec("update users set interests=$2 where id=$1", userId, val)
+	return err
+}
+
+func (db *MyDb) UpdateZip(userId int64, val string) error {
+	_, err := db.Exec("update users set zip=$2 where id=$1", userId, val)
+	return err
+}
+
+func (db *MyDb) UpdateLocation(userId int64, val string) error {
+	_, err := db.Exec("update users set location=$2 where id=$1", userId, val)
 	return err
 }
 
