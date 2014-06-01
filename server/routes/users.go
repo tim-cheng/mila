@@ -186,7 +186,7 @@ func (rt *Routes) PutUser(params martini.Params, req *http.Request, r render.Ren
 			}
 		}
 		if name := req.FormValue("last_name"); name != "" {
-			err = rt.Db.UpdateFirstName(user.Id, name)
+			err = rt.Db.UpdateLastName(user.Id, name)
 			if err != nil {
 				break
 			}

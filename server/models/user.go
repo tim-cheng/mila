@@ -50,7 +50,7 @@ func (db *MyDb) NewUser(typ, email, password, firstName, lastName, fb_id, locati
 		Admin:       false,
 		FirstName:   firstName,
 		LastName:    lastName,
-		Description: "proud parent",
+		Description: "",
 		FbId:        fb_id,
 		Location:    location,
 		Zip:         zip,
