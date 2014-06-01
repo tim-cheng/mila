@@ -31,6 +31,7 @@ func (db *MyDb) update2dConnection(userId int64) {
 	if err == nil {
 		set2d := make(map[int64]bool)
 		for _, id := range ids {
+			set2d[id] = true
 			id2s, err := db.Get1dConnectionById(id)
 			if err == nil {
 				for _, v := range id2s {
