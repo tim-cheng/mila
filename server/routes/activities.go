@@ -29,6 +29,7 @@ func (rt *Routes) GetActivities(params martini.Params, r render.Render) {
 					"friend_id": a.FriendId,
 					"post_id":   a.PostId,
 					"activity":  u.FirstName + " " + u.LastName + " " + typeStr + " " + a.Message,
+					"created_at": a.CreatedAt,
 				}
 			}
 		}
