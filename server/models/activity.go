@@ -38,7 +38,7 @@ func (db *MyDb) GetActivities(userId string) ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	activities, err := db.Select(Activity{}, "select * from activities where user_id=$1", id)
+	activities, err := db.Select(Activity{}, "select * from activities where user_id=$1 order by id desc", id)
 	return activities, err
 }
 
