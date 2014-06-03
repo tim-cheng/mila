@@ -265,7 +265,7 @@ func TestBasic(t *testing.T) {
 	code, resp, _ := testClientJsonResp(e, p, "GET", "/activities/8", "")
 	respAry, _ := resp.Array()
 	fmt.Println("response ", resp)
-	checkCode2(t, "get activities post", code, len(respAry), 200, 3)
+	checkCode2(t, "get activities post", code, len(respAry), 200, 2)
 
 	// kids
 	checkCode(t, "add kids", createKid("8", "jane", "2010-03-05", "girl"), 201)

@@ -31,7 +31,8 @@ func (rt *Routes) PostPost(r render.Render, req *http.Request) {
 					if err == nil {
 						rt.Db.PostFeed(feed)
 					}
-					rt.postActivityPost(id, post.UserId, post.Id, post.Body)
+					// TODO: new post is not activity
+					// rt.postActivityPost(id, post.UserId, post.Id, post.Body)
 				}
 			}
 
