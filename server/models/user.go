@@ -71,7 +71,7 @@ func (db *MyDb) GetUserName(id interface{}) (*User, error) {
 
 func (db *MyDb) GetUserNameByEmail(email string) (*User, error) {
 	var user User
-	err := db.SelectOne(&user, "select id, first_name, last_name from users where email=$1", email)
+	err := db.SelectOne(&user, "select id, first_name, last_name from users where lower(email)=$1", email)
 	return &user, err
 }
 
@@ -142,24 +142,24 @@ func (db *MyDb) GetUserPicture(userId int64) ([]byte, error) {
 
 func (db *MyDb) GetPassword(email string) (string, error) {
 	p := ""
-	err := db.SelectOne(&p, "select password from users where email=$1", email)
+	err := db.SelectOne(&p, "select password from users where lower(email)=$1", email)
 	return p, err
 }
 
 func (db *MyDb) GetUsersByFirstName(name string) ([]User, error) {
 	var users []User
-	_, err := db.Select(&users, "select id, first_name, last_name from users where first_name=$1", name)
+	_, err := db.Select(&users, "select id, first_name, last_name from users where first_name ilike $1", name)
 	return users, err
 }
 
 func (db *MyDb) GetUsersByLastName(name string) ([]User, error) {
 	var users []User
-	_, err := db.Select(&users, "select id, first_name, last_name from users where last_name=$1", name)
+	_, err := db.Select(&users, "select id, first_name, last_name from users where last_name ilike $1", name)
 	return users, err
 }
 
 func (db *MyDb) GetUsersByFullName(firstName, lastName string) ([]User, error) {
 	var users []User
-	_, err := db.Select(&users, "select id, first_name, last_name  from users where first_name=$1 and last_name=$2", firstName, lastName)
+	_, err := db.Select(&users, "select id, first_name, last_name  from users where first_name ilike $1 and last_name ilike $2", firstName, lastName)
 	return users, err
 }
