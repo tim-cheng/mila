@@ -11,8 +11,11 @@ import (
 func sendNewUserEmail(email, firstName string) {
 	mandrill.Key = "izQqlSTrNP4ZKZQ_rtM3-Q"
 	msg := mandrill.NewMessageTo(email, firstName)
-	msg.HTML = "<p>Welcome to Parent2D</p>"
-	msg.Text = "Welcome to Parent2D"
+	msg.Text = "Dear " + firstName + ",\n\n" +
+		"Welcome to Parent2D, a great way to connect and interact with your trusted fellow parents within your 2 degree network. Getting answers and sharing parenting insights have never been so easy, quick, and fun!\n\n" +
+		"Go ahead a give a try. Invite more friends to join. Connect and be better informed parents!\n\n" +
+		"Sherry\n"
+	msg.HTML = "<p>" + msg.Text + "</p>"
 	msg.Subject = "Welcome to Parent2D"
 	msg.FromEmail = "sherry@parent2d.com"
 	msg.FromName = "Parent2D"
