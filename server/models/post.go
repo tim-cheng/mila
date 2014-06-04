@@ -102,7 +102,7 @@ func (db *MyDb) GetPosts(userId string, degree string) ([]interface{}, error) {
 	var posts []interface{}
 	var query string
 	if degree == "" || degree == "0" {
-		query = "select id, created_at, user_id, body, bg_color, has_picture, user_id from posts where user_id=$1"
+		query = "select id, created_at, user_id, body, bg_color, has_picture, user_id from posts where user_id=$1 order by created_at desc"
 	} else if degree == "1" {
 		query = "select id, created_at, user_id, body, bg_color, has_picture, user_id from posts where user_id in " +
 			"(select $1 UNION (select user2_id from connections where user1_id=$1) " +
