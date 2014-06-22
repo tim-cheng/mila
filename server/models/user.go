@@ -160,7 +160,7 @@ func (db *MyDb) GetUsersByLastName(name string) ([]User, error) {
 
 func (db *MyDb) GetUsersByFullName(firstName, lastName string) ([]User, error) {
 	var users []User
-	_, err := db.Select(&users, "select id, first_name, last_name  from users where first_name ilike $1 and last_name ilike $2", firstName, lastName)
+	_, err := db.Select(&users, "select id, first_name, last_name, location from users where first_name ilike $1 and last_name ilike $2", firstName, lastName)
 	return users, err
 }
 
@@ -170,6 +170,6 @@ func (db *MyDb) GetUsersByFbIdList(fbIds []string) ([]User, error) {
 	for _, v := range fbIds {
 		cond += " or fb_id = '" + v + "'"
 	}
-	_, err := db.Select(&users, "select id, first_name, last_name from users where "+cond)
+	_, err := db.Select(&users, "select id, first_name, last_name, location from users where "+cond)
 	return users, err
 }
