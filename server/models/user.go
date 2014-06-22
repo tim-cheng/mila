@@ -166,9 +166,9 @@ func (db *MyDb) GetUsersByFullName(firstName, lastName string) ([]User, error) {
 
 func (db *MyDb) GetUsersByFbIdList(fbIds []string) ([]User, error) {
 	var users []User
-	cond := "fb_id = 1"
+	cond := "fb_id = '1'"
 	for _, v := range fbIds {
-		cond += " or fb_id = " + v
+		cond += " or fb_id = '" + v + "'"
 	}
 	_, err := db.Select(&users, "select id, first_name, last_name from users where $1", cond)
 	return users, err
