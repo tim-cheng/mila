@@ -170,6 +170,6 @@ func (db *MyDb) GetUsersByFbIdList(fbIds []string) ([]User, error) {
 	for _, v := range fbIds {
 		cond += " or fb_id = '" + v + "'"
 	}
-	_, err := db.Select(&users, "select id, first_name, last_name from users where $1", cond)
+	_, err := db.Select(&users, "select id, first_name, last_name from users where "+cond)
 	return users, err
 }
