@@ -315,6 +315,30 @@ func (rt *Routes) UpdateUserDesc(userId string) {
 }
 
 func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
+
+	searchfb := req.FormValue("searchfb")
+	if searchfb != "" {
+		// if searching FB friends
+		fbIds := strings.Split(searchfb, "+")
+		res, err := rt.Db.GetUsersByFbIdList(fbIds)
+		if err != nil || len(res) == 0 {
+			r.JSON(404, map[string]interface{}{
+				"message": "no users found",
+			})
+			return
+		}
+		resMsg := make([]map[string]interface{}, len(res), len(res))
+		for i, u := range res {
+			resMsg[i] = map[string]interface{}{
+				"id":         u.Id,
+				"first_name": u.FirstName,
+				"last_name":  u.LastName,
+			}
+		}
+		r.JSON(200, resMsg)
+		return
+	}
+
 	search := req.FormValue("search")
 	if search == "" {
 		r.JSON(404, map[string]interface{}{

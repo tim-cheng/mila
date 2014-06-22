@@ -163,3 +163,13 @@ func (db *MyDb) GetUsersByFullName(firstName, lastName string) ([]User, error) {
 	_, err := db.Select(&users, "select id, first_name, last_name  from users where first_name ilike $1 and last_name ilike $2", firstName, lastName)
 	return users, err
 }
+
+func (db *MyDb) GetUsersByFbIdList(fbIds []string) ([]User, error) {
+	var users []User
+	cond := "fb_id = 1"
+	for _, v := range fbIds {
+		cond += " or fb_id = " + v
+	}
+	_, err := db.Select(&users, "select id, first_name, last_name from users where $1", cond)
+	return users, err
+}
