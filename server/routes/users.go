@@ -314,7 +314,22 @@ func (rt *Routes) UpdateUserDesc(userId string) {
 	}
 }
 
+func idInList(id int64, list []int64) bool {
+	if list == nil {
+		return false
+	}
+	for _, v := range list {
+		if v == id {
+			return true
+		}
+	}
+	return false
+}
+
 func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
+
+	from := req.FormValue("from")
+	conn1d, _ := rt.Db.Get1dConnectionById(from)
 
 	searchfb := req.FormValue("searchfb")
 	if searchfb != "" {
@@ -333,6 +348,8 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 				"id":         u.Id,
 				"first_name": u.FirstName,
 				"last_name":  u.LastName,
+				"location":   u.Location,
+				"connected":  idInList(u.Id, conn1d),
 			}
 		}
 		r.JSON(200, resMsg)
@@ -378,6 +395,8 @@ func (rt *Routes) SearchUsers(r render.Render, req *http.Request) {
 			"id":         u.Id,
 			"first_name": u.FirstName,
 			"last_name":  u.LastName,
+			"location":   u.Location,
+			"connected":  idInList(u.Id, conn1d),
 		}
 	}
 

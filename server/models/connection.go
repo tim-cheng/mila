@@ -103,7 +103,7 @@ func (db *MyDb) GetConnections(userId string) ([]interface{}, error) {
 	return db.Select(Connection{}, "select user1_id, user2_id from connections where user1_id=$1 or user2_id=$1", uId)
 }
 
-func (db *MyDb) Get1dConnectionById(userId int64) ([]int64, error) {
+func (db *MyDb) Get1dConnectionById(userId interface{}) ([]int64, error) {
 	var userIds []int64
 	_, err := db.Select(&userIds, "select user1_id from connections where user2_id=$1 union select user2_id from connections where user1_id=$1", userId)
 	fmt.Println("Get1dConnectionById ", userIds, err)
