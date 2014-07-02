@@ -128,3 +128,10 @@ func (rt *Routes) GetPostPicture(params martini.Params, r render.Render, w http.
 		})
 	}
 }
+
+func (rt *Routes) PostReport(r render.Render) {
+	// TODO: add real handling
+	r.JSON(201, map[string]interface{}{
+		"message": "report sent",
+	})
+}

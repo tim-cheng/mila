@@ -72,6 +72,8 @@ func startServer() {
 	m.Post("/posts/:id/comments", authFunc, router.PostComment)
 	m.Get("/posts/:id/comments", authFunc, router.GetComments)
 
+	m.Post("/posts/:id/report", authFunc, router.PostReport)
+
 	m.Put("/posts/:id/stars", authFunc, router.PutStar)
 	m.Delete("/posts/:id/stars", authFunc, router.DeleteStar)
 
