@@ -41,9 +41,8 @@ func startServer() {
 	m.Use(martini.Static("assets"))
 
 	// special case for facebook
-	m.Post("/", func() string {
-		return "<h1>Avaialable now on the App Store</h1>" +
-			"<a href=\"https://itunes.apple.com/us/app/parent2d/id892139098?ls=1&mt=8\">Download Now</a>"
+	m.Post("/", func(r render.Render) {
+		r.Redirect("/")
 	})
 
 	m.Get("/login", authFunc, router.Login)
